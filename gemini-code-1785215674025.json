@@ -1,0 +1,23 @@
+{
+  "destinations": [
+    {
+      "id": "valparai",
+      "name": "Valparai",
+      "state": "Tamil Nadu",
+      "category": "Hill Station",
+      "nearestAirport": "Coimbatore (CJB) - 120 km",
+      "nearestRailway": "Pollachi - 64 km",
+      "bestTime": "October to March",
+      "idealDuration": "3 Days",
+      "hairpinBends": 40,
+      "foodGuide": {
+        "veg": ["Filter Coffee", "Tamil Meals", "Kothu Parotta"],
+        "spots": ["Local Tea Factory Stalls", "Town Market Mess"]
+      },
+      "verificationLinks": {
+        "bus": "https://www.tnstc.in",
+        "train": "https://www.irctc.co.in"
+      }
+    }
+  ]
+}
