@@ -3,1941 +3,486 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>DigiTravel – Plan Smarter. Travel Better.</title>
-  <meta name="description" content="Compare flights, trains, buses and hotels. Generate AI itineraries. Plan your complete trip budget. India's smartest travel platform."/>
-  <meta name="keywords" content="travel, flights, trains, hotels, itinerary, trip planner, India travel"/>
-  <meta property="og:title" content="DigiTravel – Plan Smarter. Travel Better."/>
-  <meta property="og:description" content="Compare travel options and generate AI itineraries in one place."/>
-  <meta name="theme-color" content="#0B2545"/>
+  <title>DigiTravel – Explore India. Plan Better. Travel Smarter.</title>
+  <meta name="description" content="India's Smart Travel Knowledge & Itinerary Platform. Discover destinations, build itineraries, estimate budgets, and verify transport options."/>
+  <meta name="theme-color" content="#0EA5E9"/>
 
-  <!-- PWA Manifest inline -->
   <link rel="manifest" href="manifest.json"/>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌍</text></svg>"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>"/>
 
-  <!-- Chart.js CDN -->
+  <!-- Chart.js CDN for Budget & Visuals -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 
-  <!-- Firebase SDK -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-    // ══════════════════════════════════════════════
-    // 🔧 REPLACE WITH YOUR FIREBASE CONFIG
-    // Get this from: Firebase Console → Project Settings → Your Apps
-    // ══════════════════════════════════════════════
-    const firebaseConfig = {
-  apiKey: "AIzaSyDMWR2ZWYFhTyRRrep8buxQONzCkB7s4hI",
-  authDomain: "digitravel-cb42c.firebaseapp.com",
-  projectId: "digitravel-cb42c",
-  storageBucket: "digitravel-cb42c.firebasestorage.app",
-  messagingSenderId: "1076611980196",
-  appId: "1:1076611980196:web:80ed02c748e78b659f3f31",
-  measurementId: "G-GV1WJ8FBJP"
-  };
-    const app  = initializeApp(firebaseConfig);
-    const db   = getFirestore(app);
-    const auth = getAuth(app);
-
-    // Expose to global scope for use in non-module scripts
-    window._db   = db;
-    window._auth = auth;
-    window._fb   = { collection, addDoc, getDocs, query, where, orderBy,
-                     signInWithEmailAndPassword, createUserWithEmailAndPassword,
-                     signOut, onAuthStateChanged };
-
-    // Auth state listener
-    onAuthStateChanged(auth, user => {
-      window._user = user;
-      document.dispatchEvent(new CustomEvent("authChanged", { detail: user }));
-    });
-  </script>
-
   <style>
-    /* ── RESET & BASE ── */
+    /* ── RESET & BRAND SYSTEM ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --navy:   #0B2545;
-      --royal:  #1565C0;
-      --sky:    #1E88E5;
-      --cyan:   #00BCD4;
-      --mint:   #00E5CC;
-      --white:  #FFFFFF;
-      --ice:    #F0F7FF;
-      --steel:  #E3EEF9;
-      --slate:  #546E7A;
-      --muted:  #90A4AE;
-      --green:  #00897B;
-      --amber:  #F9A825;
-      --rose:   #E53935;
-      --purple: #7B1FA2;
-      --wa:     #25D366;
-      --radius: 14px;
-      --shadow: 0 4px 20px rgba(11,37,69,.10);
+      --primary:   #0EA5E9;
+      --secondary: #10B981;
+      --accent:    #F59E0B;
+      --bg:        #F8FAFC;
+      --card-bg:   #FFFFFF;
+      --navy:      #0F172A;
+      --slate:     #475569;
+      --border:    #E2E8F0;
+      --radius:    14px;
+      --shadow:    0 4px 20px rgba(15, 23, 42, 0.08);
     }
+
+    body.dark {
+      --bg:        #0F172A;
+      --card-bg:   #1E293B;
+      --navy:      #F8FAFC;
+      --slate:     #94A3B8;
+      --border:    #334155;
+    }
+
     body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: var(--ice);
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
       color: var(--navy);
       min-height: 100vh;
-      padding-bottom: 70px;
+      padding-bottom: 75px;
+      line-height: 1.5;
     }
-    body.dark {
-      --ice:   #0A1929;
-      --steel: #1A3A5C;
-      --white: #0D2137;
-      --navy-txt: #E2E8F0;
-      background: #0A1929;
-      color: #E2E8F0;
-    }
-    h1,h2,h3,h4,h5 { font-weight: 800; line-height: 1.2; }
-    input, select, textarea {
-      font-family: inherit;
-      outline: none;
-      transition: border-color .2s;
-    }
-    input:focus, select:focus { border-color: var(--sky) !important; }
-    button { font-family: inherit; cursor: pointer; transition: opacity .15s, transform .1s; }
-    button:active { transform: scale(.97); }
-    a { color: inherit; text-decoration: none; }
-    img { max-width: 100%; }
-    ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-thumb { background: #d0dff0; border-radius: 99px; }
 
-    /* ── LAYOUT ── */
-    .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+    h1, h2, h3, h4, h5 { font-weight: 800; line-height: 1.2; }
+    button { font-family: inherit; cursor: pointer; border: none; transition: all .2s; }
+    button:active { transform: scale(0.98); }
+    a { color: inherit; text-decoration: none; }
+    input, select, textarea { font-family: inherit; outline: none; border-radius: 8px; }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
     .page { display: none; }
     .page.active { display: block; }
 
-    /* ── NAV ── */
+    /* ── TOP NAV ── */
     #topnav {
-      background: var(--navy);
-      color: #fff;
-      position: sticky;
-      top: 0;
-      z-index: 200;
-      box-shadow: 0 2px 16px rgba(0,0,0,.25);
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 200;
     }
     .nav-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 58px;
-      padding: 0 20px;
-      max-width: 1200px;
-      margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px; max-width: 1200px; margin: 0 auto; padding: 0 20px;
     }
     .logo {
-      background: none;
-      border: none;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 20px;
-      font-weight: 900;
-      letter-spacing: -1px;
+      display: flex; align-items: center; gap: 8px; font-size: 22px; font-weight: 900; background: none;
     }
-    .logo .accent {
-      background: linear-gradient(90deg, var(--cyan), var(--mint));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .logo .badge {
-      background: rgba(0,229,204,.2);
-      color: var(--mint);
-      font-size: 9px;
-      font-weight: 800;
-      border-radius: 6px;
-      padding: 2px 7px;
-      letter-spacing: 1.5px;
-      -webkit-text-fill-color: var(--mint);
-    }
-    .nav-links { display: flex; gap: 4px; align-items: center; }
+    .logo-brand { color: var(--primary); }
+    .nav-links { display: flex; gap: 6px; align-items: center; }
     .nav-btn {
-      background: none;
-      border: none;
-      border-radius: 8px;
-      padding: 7px 12px;
-      color: #fff;
-      font-weight: 700;
-      font-size: 12px;
-      white-space: nowrap;
+      background: none; border-radius: 8px; padding: 8px 14px;
+      font-weight: 700; font-size: 13px; color: var(--slate);
     }
-    .nav-btn:hover, .nav-btn.active { background: rgba(255,255,255,.15); }
-    .btn-wa-nav {
-      background: var(--wa);
-      border: none;
-      color: #fff;
-      border-radius: 8px;
-      padding: 7px 14px;
-      font-weight: 800;
-      font-size: 12px;
+    .nav-btn:hover, .nav-btn.active { color: var(--primary); background: rgba(14, 165, 233, 0.1); }
+    .btn-dark { background: rgba(148, 163, 184, 0.1); padding: 8px 12px; border-radius: 8px; font-size: 14px; }
+
+    /* ── HERO BANNER ── */
+    #hero {
+      background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+      color: #FFF; padding: 50px 20px; text-align: center; position: relative;
     }
-    .btn-dark {
-      background: rgba(255,255,255,.1);
-      border: none;
-      color: #fff;
-      border-radius: 8px;
-      padding: 7px 12px;
-      font-size: 14px;
+    .hero-title { font-size: clamp(28px, 4vw, 48px); margin-bottom: 12px; }
+    .hero-accent { color: var(--primary); }
+    .hero-sub { color: #94A3B8; font-size: 16px; max-width: 600px; margin: 0 auto 30px; }
+
+    .search-box {
+      background: var(--card-bg); border-radius: 16px; padding: 20px;
+      max-width: 900px; margin: 0 auto; box-shadow: var(--shadow);
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;
     }
-    .hamburger { background:none; border:none; color:#fff; font-size:22px; display:none; }
-    #mobile-menu {
-      display: none;
-      background: var(--navy);
-      border-top: 1px solid rgba(255,255,255,.1);
-      padding: 8px 20px 16px;
+    .search-field {
+      width: 100%; padding: 12px; border: 1.5px solid var(--border);
+      background: var(--bg); color: var(--navy); font-size: 14px;
     }
-    #mobile-menu button {
-      display: block;
-      width: 100%;
-      background: none;
-      border: none;
-      border-radius: 8px;
-      padding: 10px 12px;
-      color: #fff;
-      font-weight: 700;
-      font-size: 14px;
-      text-align: left;
-      margin-bottom: 2px;
+    .btn-search {
+      background: var(--primary); color: #FFF; font-weight: 800;
+      border-radius: 8px; padding: 12px; font-size: 15px; grid-column: 1 / -1;
     }
-    #mobile-menu button:hover { background: rgba(255,255,255,.1); }
+
+    .chips-wrap { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 18px; }
+    .chip {
+      background: rgba(255, 255, 255, 0.1); border-radius: 20px;
+      padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer;
+    }
+    .chip:hover { background: var(--primary); }
+
+    /* ── CARDS & GRIDS ── */
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+    .card {
+      background: var(--card-bg); border: 1.5px solid var(--border);
+      border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
+    }
+    .card-title { font-size: 18px; margin-bottom: 8px; font-weight: 800; }
+    .card-sub { font-size: 13px; color: var(--slate); margin-bottom: 12px; }
+
+    /* ── VERIFICATION COMPARISON MATRIX ── */
+    .verify-badge {
+      display: inline-block; background: rgba(16, 185, 129, 0.15); color: var(--secondary);
+      padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; text-transform: uppercase;
+    }
+
+    /* ── DAY-WISE ITINERARY ── */
+    .day-slot {
+      border-left: 3px solid var(--primary); padding-left: 14px; margin-bottom: 16px;
+    }
+    .day-slot-title { font-weight: 800; font-size: 14px; color: var(--primary); }
+
+    /* ── SEAT MAP ALLOCATION ── */
+    .bus-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+      max-width: 280px; background: var(--bg); padding: 16px; border-radius: 12px; border: 1.5px solid var(--border);
+    }
+    .seat {
+      background: var(--card-bg); border: 1.5px solid var(--border);
+      height: 40px; border-radius: 6px; display: flex; align-items: center;
+      justify-content: center; font-size: 11px; font-weight: 800; cursor: pointer;
+    }
+    .seat.selected { background: var(--secondary); color: #FFF; border-color: var(--secondary); }
 
     /* ── BOTTOM NAV ── */
     #bottom-nav {
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      background: #fff;
-      border-top: 1px solid var(--steel);
-      display: flex;
-      z-index: 150;
-      box-shadow: 0 -4px 16px rgba(0,0,0,.08);
+      position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg);
+      border-top: 1px solid var(--border); display: flex; z-index: 150;
     }
-    body.dark #bottom-nav { background: #0D2137; border-color: #1A3A5C; }
     .bnav-btn {
-      flex: 1;
-      background: none;
-      border: none;
-      padding: 8px 0 10px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-      color: var(--muted);
-      font-size: 9px;
-      font-weight: 700;
+      flex: 1; background: none; padding: 10px 0; display: flex;
+      flex-direction: column; align-items: center; gap: 3px;
+      color: var(--slate); font-size: 10px; font-weight: 700;
     }
-    .bnav-btn.active { color: var(--sky); }
-    .bnav-btn .bicon { font-size: 18px; }
+    .bnav-btn.active { color: var(--primary); }
 
-    /* ── BUTTONS ── */
-    .btn-primary {
-      background: var(--royal);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      padding: 9px 18px;
-      font-weight: 800;
-      font-size: 14px;
-    }
-    .btn-outline {
-      background: transparent;
-      color: var(--royal);
-      border: 2px solid var(--royal);
-      border-radius: 10px;
-      padding: 9px 18px;
-      font-weight: 700;
-      font-size: 14px;
-    }
-    .btn-wa {
-      background: var(--wa);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      padding: 9px 18px;
-      font-weight: 800;
-      font-size: 14px;
-    }
-    .btn-search {
-      width: 100%;
-      background: linear-gradient(90deg, var(--royal), var(--sky));
-      color: #fff;
-      border: none;
-      border-radius: 12px;
-      padding: 14px 0;
-      font-size: 16px;
-      font-weight: 900;
-      letter-spacing: .5px;
-      box-shadow: 0 4px 16px rgba(30,136,229,.4);
-    }
-
-    /* ── FORM INPUTS ── */
-    .form-field {
-      width: 100%;
-      border: 1.5px solid var(--steel);
-      border-radius: 10px;
-      padding: 10px 12px;
-      font-size: 14px;
-      color: var(--navy);
-      background: var(--ice);
-    }
-    body.dark .form-field { background: #0d2137; color: #e2e8f0; border-color: #1A3A5C; }
-    .field-label {
-      display: block;
-      font-size: 10px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--navy);
-      margin-bottom: 5px;
-    }
-
-    /* ── CARDS ── */
-    .card {
-      background: #fff;
-      border: 1.5px solid var(--steel);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-    }
-    body.dark .card { background: #0D2137; border-color: #1A3A5C; }
-
-    /* ── BADGES ── */
-    .badge {
-      font-size: 10px;
-      font-weight: 800;
-      padding: 2px 9px;
-      border-radius: 99px;
-      letter-spacing: .5px;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-    .badge-cheap   { background:#E8F5E9; color:#2E7D32; }
-    .badge-fast    { background:#EDE7F6; color:#4527A0; }
-    .badge-rec     { background:#FFF8E1; color:#F57F17; }
-    .badge-luxury  { background:#FCE4EC; color:#880E4F; }
-    .badge-rated   { background:#E3F2FD; color:#0D47A1; }
-    .badge-value   { background:#E8F5E9; color:#1B5E20; }
-    .badge-low     { background:#FFF3E0; color:#E65100; }
-    .badge-hot     { background:#FFEBEE; color:#B71C1C; }
-    .badge-warm    { background:#FFF8E1; color:#F57F17; }
-    .badge-cold    { background:#E3F2FD; color:#0D47A1; }
-    .badge-booked  { background:#E8F5E9; color:#2E7D32; }
-
-    /* ── HERO ── */
-    #hero {
-      background: linear-gradient(150deg, var(--navy) 0%, #1a3a6e 40%, var(--royal) 100%);
-      padding: 52px 24px 48px;
-      color: #fff;
-      position: relative;
-      overflow: hidden;
-    }
-    #hero::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse at 10% 60%, rgba(0,188,212,.18) 0%, transparent 60%),
-        radial-gradient(ellipse at 90% 10%, rgba(30,136,229,.2)  0%, transparent 55%);
-      pointer-events: none;
-    }
-    .hero-inner { position: relative; max-width: 900px; margin: 0 auto; text-align: center; }
-    .hero-eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(255,255,255,.1);
-      border-radius: 99px;
-      padding: 5px 18px;
-      margin-bottom: 18px;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-    }
-    .hero-title {
-      font-size: clamp(26px, 5vw, 52px);
-      font-weight: 900;
-      margin-bottom: 12px;
-      letter-spacing: -1px;
-    }
-    .hero-title .gradient-text {
-      background: linear-gradient(90deg, var(--cyan), var(--mint));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .hero-sub { font-size: 16px; opacity: .78; margin-bottom: 36px; max-width: 520px; margin-inline: auto; line-height: 1.6; }
-    .search-card {
-      background: rgba(255,255,255,.97);
-      border-radius: 20px;
-      padding: 24px;
-      box-shadow: 0 20px 60px rgba(0,0,0,.25);
-    }
-    .search-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-    .hero-pills { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 22px; }
-    .hero-pill {
-      background: rgba(255,255,255,.12);
-      border-radius: 20px;
-      padding: 5px 14px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    /* ── STATS BAR ── */
-    .stats-bar {
-      background: var(--navy);
-      color: #fff;
-      padding: 18px 24px;
-    }
-    .stats-inner {
-      max-width: 1100px;
-      margin: 0 auto;
-      display: flex;
-      gap: 32px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .stat-item { text-align: center; }
-    .stat-val { font-size: 20px; font-weight: 900; color: var(--mint); }
-    .stat-lbl { font-size: 11px; opacity: .7; }
-
-    /* ── RESULT TABS ── */
-    .tab-bar {
-      background: #fff;
-      border-bottom: 2px solid var(--steel);
-      position: sticky;
-      top: 58px;
-      z-index: 50;
-    }
-    body.dark .tab-bar { background: #0D2137; }
-    .tab-bar-inner {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 0 20px;
-    }
-    .tabs { display: flex; overflow-x: auto; }
-    .tab-btn {
-      background: none;
-      border: none;
-      padding: 12px 18px;
-      font-weight: 700;
-      font-size: 13px;
-      color: var(--muted);
-      border-bottom: 3px solid transparent;
-      margin-bottom: -2px;
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .tab-btn.active { color: var(--sky); border-bottom-color: var(--sky); }
-    .tab-count {
-      background: var(--ice);
-      color: var(--muted);
-      border-radius: 99px;
-      padding: 1px 7px;
-      font-size: 11px;
-      font-weight: 800;
-    }
-    .tab-btn.active .tab-count { background: rgba(30,136,229,.15); color: var(--sky); }
-
-    /* ── RESULT CARD ── */
-    .result-card {
-      background: #fff;
-      border: 1.5px solid var(--steel);
-      border-radius: 16px;
-      padding: 18px 22px;
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      flex-wrap: wrap;
-      box-shadow: 0 2px 12px rgba(0,0,0,.06);
-      margin-bottom: 12px;
-    }
-    body.dark .result-card { background: #0D2137; border-color: #1A3A5C; }
-    .result-provider { font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
-    .result-name { font-weight: 800; font-size: 15px; margin-top: 2px; }
-    .result-time { font-size: 22px; font-weight: 900; }
-    .result-dur { font-size: 12px; color: var(--muted); font-weight: 700; text-align: center; }
-    .result-price { font-size: 24px; font-weight: 900; color: var(--royal); }
-    .result-price-label { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
-    .result-actions { display: flex; gap: 8px; justify-content: flex-end; }
-    .result-info { font-size: 12px; color: var(--slate); }
-
-    /* ── PACKAGE CARD ── */
-    .pkg-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 20px;
-    }
-    .pkg-card {
-      background: #fff;
-      border: 1.5px solid var(--steel);
-      border-radius: 18px;
-      overflow: hidden;
-      box-shadow: var(--shadow);
-    }
-    body.dark .pkg-card { background: #0D2137; border-color: #1A3A5C; }
-    .pkg-img {
-      height: 130px;
-      background: linear-gradient(135deg, var(--navy), var(--sky));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
-    .pkg-emoji { font-size: 64px; }
-    .pkg-duration {
-      position: absolute;
-      bottom: 10px;
-      right: 12px;
-      background: rgba(0,0,0,.5);
-      border-radius: 20px;
-      padding: 3px 12px;
-      color: #fff;
-      font-size: 11px;
-      font-weight: 700;
-    }
-    .pkg-body { padding: 20px; }
-    .pkg-title { font-size: 18px; font-weight: 900; }
-    .pkg-tagline { font-size: 12px; color: var(--muted); font-style: italic; margin-top: 2px; }
-    .pkg-price { font-size: 20px; font-weight: 900; color: var(--royal); }
-    .pkg-price-label { font-size: 10px; color: var(--muted); }
-
-    /* ── SECTION HEADER ── */
-    .section-header { margin-bottom: 22px; }
-    .section-title { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 900; margin-bottom: 4px; }
-    .section-sub { color: var(--slate); font-size: 14px; }
-
-    /* ── AGENT LOGIN ── */
-    .agent-login-wrap { max-width: 400px; margin: 40px auto; padding: 20px; }
-
-    /* ── STAT CARDS ── */
-    .stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 24px; }
-    .stat-card { padding: 18px; display: flex; align-items: center; gap: 12px; }
-    .stat-icon { border-radius: 12px; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
-    .stat-number { font-size: 20px; font-weight: 900; }
-    .stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
-
-    /* ── TABLE ── */
-    .data-table { width: 100%; border-collapse: collapse; min-width: 600px; }
-    .data-table th {
-      padding: 10px 14px;
-      text-align: left;
-      color: var(--slate);
-      font-size: 11px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: .5px;
-      background: var(--ice);
-    }
-    body.dark .data-table th { background: #0a1929; }
-    .data-table td { padding: 12px 14px; border-bottom: 1px solid var(--steel); }
-    .table-wrap { overflow-x: auto; border-radius: 12px; border: 1.5px solid var(--steel); }
-
-    /* ── BUDGET ── */
-    .budget-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      border-radius: 12px;
-      margin-bottom: 10px;
-    }
-    .budget-total {
-      background: linear-gradient(135deg, var(--navy), var(--royal));
-      border-radius: 14px;
-      padding: 24px;
-      color: #fff;
-    }
-    .budget-total-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 0;
-    }
-
-    /* ── ITINERARY DAY ── */
-    .day-card {
-      border-radius: 16px;
-      padding: 24px;
-      margin-bottom: 16px;
-      border: 1.5px solid var(--steel);
-    }
-    .day-badge {
-      background: var(--royal);
-      color: #fff;
-      border-radius: 8px;
-      padding: 3px 12px;
-      font-size: 12px;
-      font-weight: 800;
-      display: inline-block;
-      margin-bottom: 8px;
-    }
-    .day-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 12px;
-      margin-top: 14px;
-    }
-    .day-section {
-      background: rgba(255,255,255,.65);
-      border-radius: 10px;
-      padding: 12px;
-    }
-    .day-section-title { font-weight: 800; font-size: 12px; margin-bottom: 4px; }
-    .day-section-body { color: var(--slate); font-size: 13px; line-height: 1.5; }
-
-    /* ── LOADING ── */
-    .loading-dots { display: flex; gap: 8px; justify-content: center; align-items: center; padding: 48px 0; }
-    .dot {
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      background: var(--sky);
-      animation: bounce .8s ease-in-out infinite alternate;
-    }
-    .dot:nth-child(2) { animation-delay: .15s; }
-    .dot:nth-child(3) { animation-delay: .30s; }
-    @keyframes bounce { to { transform: translateY(-8px); } }
-
-    /* ── WA FLOAT ── */
-    #wa-float {
-      position: fixed;
-      bottom: 82px;
-      right: 24px;
-      background: var(--wa);
-      border: none;
-      border-radius: 50%;
-      width: 56px; height: 56px;
-      font-size: 26px;
-      z-index: 999;
-      box-shadow: 0 4px 20px rgba(37,211,102,.55);
-      animation: pulse 2.5s infinite;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    @keyframes pulse {
-      0%,100% { box-shadow: 0 4px 20px rgba(37,211,102,.5); }
-      50%      { box-shadow: 0 4px 32px rgba(37,211,102,.8); }
-    }
-
-    /* ── FOOTER ── */
-    footer {
-      background: var(--navy);
-      color: rgba(255,255,255,.7);
-      padding: 36px 24px 24px;
-    }
-    .footer-grid {
-      max-width: 1100px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 32px;
-      margin-bottom: 32px;
-    }
-    .footer-title { font-weight: 900; color: #fff; margin-bottom: 12px; font-size: 15px; }
-    .footer-link { font-size: 13px; margin-bottom: 7px; opacity: .7; cursor: pointer; }
-    .footer-link:hover { opacity: 1; }
-    .footer-bottom {
-      max-width: 1100px;
-      margin: 0 auto;
-      border-top: 1px solid rgba(255,255,255,.1);
-      padding-top: 20px;
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 8px;
-      font-size: 12px;
-      opacity: .6;
-    }
-
-    /* ── TOAST ── */
-    #toast {
-      position: fixed;
-      bottom: 88px;
-      left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: var(--navy);
-      color: #fff;
-      padding: 10px 24px;
-      border-radius: 99px;
-      font-size: 14px;
-      font-weight: 700;
-      opacity: 0;
-      transition: all .3s;
-      z-index: 9999;
-      pointer-events: none;
-    }
-    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    /* ── FEATURE CARDS ── */
-    .feature-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-      gap: 20px;
-    }
-    .feature-card {
-      padding: 24px;
-      border-radius: 18px;
-      cursor: pointer;
-    }
-    .feature-card:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(11,37,69,.12); }
-    .feature-icon { font-size: 40px; margin-bottom: 14px; }
-    .feature-title { font-size: 17px; font-weight: 800; margin-bottom: 8px; }
-    .feature-desc { color: var(--slate); font-size: 13px; line-height: 1.6; margin-bottom: 16px; }
-    .feature-cta { color: var(--sky); font-weight: 800; font-size: 13px; }
-
-    /* ── TAG ── */
-    .tag {
-      display: inline-block;
-      border-radius: 6px;
-      padding: 3px 9px;
-      font-size: 11px;
-      font-weight: 700;
-    }
-
-    /* ── MODAL ── */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.55);
-      z-index: 500;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    .modal-overlay.open { display: flex; }
-    .modal {
-      background: #fff;
-      border-radius: 20px;
-      padding: 32px;
-      max-width: 480px;
-      width: 100%;
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-    body.dark .modal { background: #0D2137; }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 768px) {
-      .nav-links { display: none; }
-      .hamburger { display: block; }
-      .result-card { flex-direction: column; align-items: flex-start; }
-      .result-actions { width: 100%; }
-      .hero-title { font-size: 28px; }
-      .search-grid { grid-template-columns: 1fr 1fr; }
-    }
-    @media print {
-      #topnav, #bottom-nav, #wa-float, footer, .noprint { display: none !important; }
-      body { padding-bottom: 0; }
-    }
+    /* ── UTILS ── */
+    .section-head { margin: 32px 0 16px; display: flex; justify-content: space-between; align-items: flex-end; }
+    .badge-tag { background: rgba(14, 165, 233, 0.1); color: var(--primary); padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
   </style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════════
-     TOP NAV
-══════════════════════════════════════════════ -->
-<nav id="topnav">
-  <div class="nav-inner">
-    <button class="logo" onclick="showPage('home')">
-      <span>🌍</span>
-      <span>Digi<span class="accent">Travel</span></span>
-      <span class="badge">PRO</span>
-    </button>
-    <div class="nav-links">
-      <button class="nav-btn" onclick="showPage('results')">Search</button>
-      <button class="nav-btn" onclick="showPage('itinerary')">AI Planner</button>
-      <button class="nav-btn" onclick="showPage('budget')">Budget</button>
-      <button class="nav-btn" onclick="showPage('packages')">Packages</button>
-      <button class="nav-btn" onclick="showPage('dashboard')">My Trips</button>
-      <button class="nav-btn" onclick="showPage('agent')">Agents</button>
-      <button class="btn-dark" onclick="toggleDark()" id="darkBtn">🌙</button>
-      <button class="btn-wa-nav" onclick="waContact()">💬 WhatsApp</button>
-    </div>
-    <button class="hamburger" onclick="toggleMenu()">☰</button>
-  </div>
-  <div id="mobile-menu">
-    <button onclick="showPage('home');toggleMenu()">🏠 Home</button>
-    <button onclick="showPage('results');toggleMenu()">🔍 Search</button>
-    <button onclick="showPage('itinerary');toggleMenu()">🤖 AI Planner</button>
-    <button onclick="showPage('budget');toggleMenu()">💸 Budget</button>
-    <button onclick="showPage('packages');toggleMenu()">🎁 Packages</button>
-    <button onclick="showPage('dashboard');toggleMenu()">👤 My Trips</button>
-    <button onclick="showPage('agent');toggleMenu()">👔 Agents</button>
-    <button onclick="toggleDark();toggleMenu()">🌙 Dark Mode</button>
-  </div>
-</nav>
-
-<!-- ══════════════════════════════════════════════
-     PAGE: HOME
-══════════════════════════════════════════════ -->
-<div id="page-home" class="page active">
-
-  <!-- Hero -->
-  <div id="hero">
-    <div class="hero-inner">
-      <div class="hero-eyebrow"><span style="color:var(--mint)">✦</span> India's Smartest Travel Platform</div>
-      <h1 class="hero-title">Plan Smarter. <span class="gradient-text">Travel Better.</span></h1>
-      <p class="hero-sub">Compare Flights, Trains, Buses & Hotels. Build a complete trip budget. Generate AI itineraries — all in one place.</p>
-
-      <div class="search-card">
-        <div class="search-grid">
-          <div>
-            <label class="field-label" style="color:var(--navy)">From</label>
-            <input class="form-field" id="s-from" placeholder="Source city" value="Mumbai"/>
-          </div>
-          <div>
-            <label class="field-label" style="color:var(--navy)">To</label>
-            <input class="form-field" id="s-to" placeholder="Destination" value="Bengaluru"/>
-          </div>
-          <div>
-            <label class="field-label" style="color:var(--navy)">Departure</label>
-            <input class="form-field" id="s-dep" type="date" value="2025-08-10"/>
-          </div>
-          <div>
-            <label class="field-label" style="color:var(--navy)">Return</label>
-            <input class="form-field" id="s-ret" type="date" value="2025-08-15"/>
-          </div>
-          <div>
-            <label class="field-label" style="color:var(--navy)">Travelers</label>
-            <input class="form-field" id="s-pax" type="number" min="1" value="2"/>
-          </div>
-          <div>
-            <label class="field-label" style="color:var(--navy)">Budget (₹)</label>
-            <input class="form-field" id="s-budget" type="number" placeholder="Optional"/>
-          </div>
-        </div>
-        <button class="btn-search" onclick="doSearch()">🔍 Search Trip</button>
-      </div>
-
-      <div class="hero-pills">
-        <span class="hero-pill">✈️ 10+ Flight Providers</span>
-        <span class="hero-pill">🚄 IRCTC + 3 Platforms</span>
-        <span class="hero-pill">🏨 100K+ Hotels</span>
-        <span class="hero-pill">🤖 AI Itinerary</span>
-        <span class="hero-pill">💬 WhatsApp Support</span>
+  <!-- TOP NAV -->
+  <nav id="topnav">
+    <div class="nav-inner">
+      <button class="logo" onclick="showPage('home')">
+        <span>🧭</span>
+        <span class="logo-brand">Digi<span style="color:var(--navy)">Travel</span></span>
+      </button>
+      <div class="nav-links">
+        <button class="nav-btn active" onclick="showPage('home')">Home</button>
+        <button class="nav-btn" onclick="showPage('explore')">Explore India</button>
+        <button class="nav-btn" onclick="showPage('planner')">Group Planner</button>
+        <button class="nav-btn" onclick="showPage('verify')">Compare & Verify</button>
+        <button class="nav-btn" onclick="showPage('bengaluru')">Bengaluru Trips</button>
+        <button class="btn-dark" onclick="toggleDark()">🌙</button>
       </div>
     </div>
-  </div>
+  </nav>
 
-  <!-- Stats Bar -->
-  <div class="stats-bar">
-    <div class="stats-inner">
-      <div class="stat-item"><div class="stat-val">10+</div><div class="stat-lbl">Flight Providers</div></div>
-      <div class="stat-item"><div class="stat-val">4</div><div class="stat-lbl">Train Platforms</div></div>
-      <div class="stat-item"><div class="stat-val">500+</div><div class="stat-lbl">Bus Operators</div></div>
-      <div class="stat-item"><div class="stat-val">100K+</div><div class="stat-lbl">Hotels</div></div>
-      <div class="stat-item"><div class="stat-val">AI</div><div class="stat-lbl">Itinerary Planner</div></div>
-    </div>
-  </div>
+  <!-- PAGE: HOME -->
+  <div id="page-home" class="page active">
+    <div id="hero">
+      <div class="hero-title">Explore India. <span class="hero-accent">Plan Better.</span> Travel Smarter.</div>
+      <p class="hero-sub">Research destinations, build day-by-day itineraries, estimate budget breakdowns, and verify official transport before booking.</p>
 
-  <!-- Feature Cards -->
-  <div class="container" style="padding-top:40px; padding-bottom:40px">
-    <div style="text-align:center; margin-bottom:32px">
-      <h2 style="font-size:28px">Everything You Need. One Platform.</h2>
-      <p style="color:var(--slate); font-size:15px; margin-top:8px">From the first search to the last night — DigiTravel has you covered.</p>
-    </div>
-    <div class="feature-grid">
-      <div class="card feature-card" onclick="showPage('results')">
-        <div class="feature-icon">🔍</div>
-        <div class="feature-title">Compare Everything</div>
-        <div class="feature-desc">Flights, trains, buses, and hotels from 20+ providers side by side.</div>
-        <div class="feature-cta">Start Searching →</div>
+      <div class="search-box">
+        <input class="search-field" id="src-dest" placeholder="State / City / Temple / Beach / Hill Station"/>
+        <select class="search-field" id="src-cat">
+          <option value="">All Categories</option>
+          <option>Hill Stations</option>
+          <option>Beaches</option>
+          <option>Pilgrimage</option>
+          <option>Weekend Trips</option>
+          <option>Heritage</option>
+        </select>
+        <button class="btn-search" onclick="handleSearch()">Explore Destinations</button>
       </div>
-      <div class="card feature-card" onclick="showPage('itinerary')">
-        <div class="feature-icon">🤖</div>
-        <div class="feature-title">AI Itinerary Generator</div>
-        <div class="feature-desc">Get a complete day-by-day travel plan with budgets in seconds.</div>
-        <div class="feature-cta">Plan My Trip →</div>
-      </div>
-      <div class="card feature-card" onclick="showPage('budget')">
-        <div class="feature-icon">💸</div>
-        <div class="feature-title">Trip Budget Calculator</div>
-        <div class="feature-desc">See your total trip cost with visual breakdowns before you book.</div>
-        <div class="feature-cta">Calculate Budget →</div>
-      </div>
-      <div class="card feature-card" onclick="showPage('packages')">
-        <div class="feature-icon">🎁</div>
-        <div class="feature-title">Holiday Packages</div>
-        <div class="feature-desc">Curated packages for Goa, Kerala, Manali, Kashmir and 6 more.</div>
-        <div class="feature-cta">View Packages →</div>
+
+      <div class="chips-wrap">
+        <span style="font-size:12px; color:#94A3B8; align-self:center">Popular:</span>
+        <span class="chip" onclick="quickSearch('Goa')">Goa</span>
+        <span class="chip" onclick="quickSearch('Gaya')">Gaya</span>
+        <span class="chip" onclick="quickSearch('Valparai')">Valparai</span>
+        <span class="chip" onclick="quickSearch('Coorg')">Coorg</span>
+        <span class="chip" onclick="quickSearch('Kerala')">Kerala</span>
+        <span class="chip" onclick="quickSearch('Leh')">Leh</span>
+        <span class="chip" onclick="quickSearch('Ooty')">Ooty</span>
       </div>
     </div>
-  </div>
 
-  <!-- Package Preview -->
-  <div style="background:#fff; padding:40px 20px">
     <div class="container">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px">
-        <h2 style="font-size:24px">🎁 Popular Packages</h2>
-        <button class="btn-outline" onclick="showPage('packages')">View All</button>
-      </div>
-      <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:16px" id="home-pkg-grid"></div>
-    </div>
-  </div>
-
-  <!-- Footer -->
-  <footer>
-    <div class="footer-grid">
-      <div>
-        <div class="footer-title">🌍 DigiTravel</div>
-        <p style="font-size:13px; line-height:1.7; opacity:.75">India's smartest travel platform. Compare, plan, and book — all in one place.</p>
-        <button class="btn-wa" style="margin-top:14px; padding:9px 18px; font-size:13px" onclick="waContact()">💬 WhatsApp Us</button>
-      </div>
-      <div>
-        <div class="footer-title">Travel</div>
-        <div class="footer-link">Flights</div>
-        <div class="footer-link">Trains</div>
-        <div class="footer-link">Buses</div>
-        <div class="footer-link">Hotels</div>
-        <div class="footer-link">Packages</div>
-      </div>
-      <div>
-        <div class="footer-title">Tools</div>
-        <div class="footer-link" onclick="showPage('itinerary')">AI Itinerary</div>
-        <div class="footer-link" onclick="showPage('budget')">Budget Calc</div>
-        <div class="footer-link" onclick="showPage('agent')">Agent Portal</div>
-        <div class="footer-link" onclick="showPage('dashboard')">My Dashboard</div>
-      </div>
-      <div>
-        <div class="footer-title">Info</div>
-        <div class="footer-link">About Us</div>
-        <div class="footer-link">Privacy Policy</div>
-        <div class="footer-link">Terms</div>
-        <div class="footer-link">Contact</div>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <div>© 2025 DigiTravel. All rights reserved.</div>
-      <div>Powered by Claude AI · Firebase · PWA Ready</div>
-    </div>
-  </footer>
-
-</div><!-- /page-home -->
-
-<!-- ══════════════════════════════════════════════
-     PAGE: RESULTS
-══════════════════════════════════════════════ -->
-<div id="page-results" class="page">
-  <div class="tab-bar">
-    <div class="tab-bar-inner">
-      <div style="font-size:13px; color:var(--slate); padding:10px 0 4px" id="query-summary"></div>
-      <div class="tabs">
-        <button class="tab-btn active" onclick="switchResultTab('flights',this)">✈️ Flights <span class="tab-count">5</span></button>
-        <button class="tab-btn" onclick="switchResultTab('trains',this)">🚄 Trains <span class="tab-count">4</span></button>
-        <button class="tab-btn" onclick="switchResultTab('buses',this)">🚌 Buses <span class="tab-count">4</span></button>
-        <button class="tab-btn" onclick="switchResultTab('hotels',this)">🏨 Hotels <span class="tab-count">5</span></button>
-      </div>
-    </div>
-  </div>
-  <div class="container" style="padding-top:24px; padding-bottom:40px">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:8px">
-      <span style="font-size:14px; color:var(--slate)" id="result-count"></span>
-      <select class="form-field" style="width:auto; padding:7px 12px; font-size:13px">
-        <option>Sort: Price Low to High</option>
-        <option>Sort: Price High to Low</option>
-        <option>Sort: Recommended</option>
-        <option>Sort: Duration</option>
-      </select>
-    </div>
-    <div id="results-container"></div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════════
-     PAGE: AI ITINERARY
-══════════════════════════════════════════════ -->
-<div id="page-itinerary" class="page">
-  <div class="container" style="padding-top:28px; padding-bottom:60px">
-    <div class="section-header">
-      <div class="section-title">🤖 AI Itinerary Generator</div>
-      <div class="section-sub">Powered by Claude AI — get a complete day-by-day plan in seconds</div>
-    </div>
-
-    <div style="background:linear-gradient(135deg,var(--navy),#1a4a8a); border-radius:18px; padding:28px; margin-bottom:28px; color:#fff">
-      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:14px">
+      <!-- Categories -->
+      <div class="section-head">
         <div>
-          <label style="font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:1px; opacity:.7; display:block; margin-bottom:6px">Destination</label>
-          <input class="form-field" id="it-dest" placeholder="City / State" value="Goa" style="background:rgba(255,255,255,.15); border-color:rgba(255,255,255,.25); color:#fff"/>
+          <h2>Quick Categories</h2>
+          <p style="color:var(--slate); font-size:14px">Find trips curated by experience type</p>
         </div>
+      </div>
+      <div class="grid-4" id="cat-grid"></div>
+
+      <!-- Special Featured Destinations -->
+      <div class="section-head">
         <div>
-          <label style="font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:1px; opacity:.7; display:block; margin-bottom:6px">Days</label>
-          <input class="form-field" id="it-days" type="number" min="1" max="30" value="5" style="background:rgba(255,255,255,.15); border-color:rgba(255,255,255,.25); color:#fff"/>
+          <h2>Featured Destinations</h2>
+          <p style="color:var(--slate); font-size:14px">Complete guides with itineraries, food guides & budget limits</p>
         </div>
+      </div>
+      <div class="grid-3" id="featured-dest-grid"></div>
+    </div>
+  </div>
+
+  <!-- PAGE: EXPLORE INDIA -->
+  <div id="page-explore" class="page">
+    <div class="container" style="padding-top:24px">
+      <div class="section-head">
         <div>
-          <label style="font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:1px; opacity:.7; display:block; margin-bottom:6px">Budget (₹)</label>
-          <input class="form-field" id="it-budget" type="number" value="20000" style="background:rgba(255,255,255,.15); border-color:rgba(255,255,255,.25); color:#fff"/>
+          <h2>All 28 States & 8 Union Territories</h2>
+          <p style="color:var(--slate); font-size:14px">Verified knowledge guides for every corner of India</p>
         </div>
+      </div>
+      <div class="grid-4" id="states-grid"></div>
+    </div>
+  </div>
+
+  <!-- PAGE: GROUP TRIP PLANNER -->
+  <div id="page-planner" class="page">
+    <div class="container" style="padding-top:24px">
+      <div class="section-head">
         <div>
-          <label style="font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:1px; opacity:.7; display:block; margin-bottom:6px">Travel Style</label>
-          <select class="form-field" id="it-style" style="background:rgba(255,255,255,.15); border-color:rgba(255,255,255,.25); color:#fff">
-            <option>Solo</option>
-            <option selected>Couple</option>
-            <option>Family</option>
-            <option>Group</option>
-            <option>Budget Backpacker</option>
-            <option>Luxury</option>
-          </select>
-        </div>
-        <div style="display:flex; align-items:flex-end">
-          <button onclick="generateItinerary()" style="width:100%; background:var(--mint); color:var(--navy); border:none; border-radius:10px; padding:11px 0; font-weight:900; font-size:15px">🗺️ Generate Plan</button>
+          <h2>AI Group Trip Planner & Expense Tracker</h2>
+          <p style="color:var(--slate); font-size:14px">Organize route, seating allocation, and shared expenses</p>
         </div>
       </div>
-    </div>
 
-    <div id="it-loading" style="display:none">
-      <div class="loading-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-      <p style="text-align:center; color:var(--slate); margin-top:-16px; font-size:14px">Claude AI is crafting your itinerary…</p>
-    </div>
-    <div id="it-output"></div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════════
-     PAGE: BUDGET CALCULATOR
-══════════════════════════════════════════════ -->
-<div id="page-budget" class="page">
-  <div class="container" style="padding-top:28px; padding-bottom:60px">
-    <div class="section-header">
-      <div class="section-title">💸 Trip Budget Calculator</div>
-      <div class="section-sub">Adjust each category to match your travel style</div>
-    </div>
-
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:24px; max-width:480px">
-      <div>
-        <label class="field-label">Travelers</label>
-        <input class="form-field" id="b-pax" type="number" min="1" value="2" oninput="calcBudget()"/>
-      </div>
-      <div>
-        <label class="field-label">Nights</label>
-        <input class="form-field" id="b-nights" type="number" min="1" value="4" oninput="calcBudget()"/>
-      </div>
-    </div>
-
-    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:24px">
-      <div id="budget-inputs"></div>
-      <div>
-        <div class="card" style="padding:20px; margin-bottom:16px">
-          <p style="font-weight:800; font-size:14px; margin-bottom:14px">📊 Breakdown Chart</p>
-          <canvas id="budgetChart" height="220"></canvas>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px">
+        <div class="card">
+          <h3 class="card-title">Trip Setup</h3>
+          <div style="display:grid; gap:12px; margin-top:14px">
+            <input class="search-field" id="planner-source" placeholder="Source City (e.g., Bengaluru)"/>
+            <input class="search-field" id="planner-dest" placeholder="Destination (e.g., Tirupati)"/>
+            <select class="search-field" id="planner-vehicle">
+              <option>Innova (6-7 Seats)</option>
+              <option>Tempo Traveller (12-16 Seats)</option>
+              <option>Mini Bus (21 Seats)</option>
+            </select>
+            <button class="btn-search" style="grid-column:auto" onclick="generateGroupPlan()">Generate Route & Itinerary Plan</button>
+          </div>
         </div>
-        <div class="budget-total" id="budget-summary"></div>
+
+        <div class="card">
+          <h3 class="card-title">Vehicle Seat Allocation</h3>
+          <p class="card-sub">Visual layout for passenger seating</p>
+          <div class="bus-grid" id="seat-map"></div>
+        </div>
       </div>
+
+      <div id="planner-output" style="margin-top:20px"></div>
     </div>
   </div>
-</div>
 
-<!-- ══════════════════════════════════════════════
-     PAGE: PACKAGES
-══════════════════════════════════════════════ -->
-<div id="page-packages" class="page">
-  <div class="container" style="padding-top:28px; padding-bottom:60px">
-    <div class="section-header">
-      <div class="section-title">🎁 Holiday Packages</div>
-      <div class="section-sub">Curated packages — everything included, zero stress</div>
-    </div>
-    <div class="pkg-grid" id="pkg-grid"></div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════════
-     PAGE: MY DASHBOARD
-══════════════════════════════════════════════ -->
-<div id="page-dashboard" class="page">
-  <div class="container" style="padding-top:28px; padding-bottom:60px">
-    <div class="section-header">
-      <div class="section-title">👤 My Dashboard</div>
-      <div class="section-sub">Your saved trips and plans</div>
-    </div>
-
-    <div id="dash-auth-prompt" style="max-width:400px; margin:0 auto; text-align:center; padding:40px 20px">
-      <div style="font-size:52px; margin-bottom:14px">🔐</div>
-      <h3 style="margin-bottom:8px">Login to See Your Trips</h3>
-      <p style="color:var(--slate); font-size:14px; margin-bottom:24px">Save itineraries, bookings and trip plans.</p>
-      <input class="form-field" id="u-email" placeholder="Email" style="margin-bottom:12px"/>
-      <input class="form-field" id="u-pass" type="password" placeholder="Password" style="margin-bottom:16px"/>
-      <button class="btn-primary" style="width:100%; padding:12px 0; font-size:15px" onclick="userLogin()">Login</button>
-      <button class="btn-outline" style="width:100%; padding:12px 0; font-size:15px; margin-top:10px" onclick="userSignup()">Create Account</button>
-    </div>
-
-    <div id="dash-content" style="display:none">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px">
-        <span id="dash-user-name" style="font-size:15px; font-weight:700; color:var(--slate)"></span>
-        <button class="btn-outline" style="padding:7px 16px; font-size:13px" onclick="userLogout()">Logout</button>
+  <!-- PAGE: COMPARE & VERIFY BEFORE BOOKING -->
+  <div id="page-verify" class="page">
+    <div class="container" style="padding-top:24px">
+      <div class="section-head">
+        <div>
+          <h2>Where to Verify Before Booking</h2>
+          <p style="color:var(--slate); font-size:14px">DigiTravel provides itinerary guidance. Verify live rates and schedules on official platforms.</p>
+        </div>
       </div>
-      <div id="saved-trips-list">
-        <div style="text-align:center; padding:40px; color:var(--muted)">
-          <div style="font-size:48px; margin-bottom:12px">✈️</div>
-          <p>No saved trips yet. Generate an itinerary and save it!</p>
-          <button class="btn-primary" style="margin-top:16px; padding:10px 24px" onclick="showPage('itinerary')">Plan a Trip</button>
+
+      <div class="grid-3">
+        <div class="card">
+          <span class="verify-badge">Official Railway Verification</span>
+          <h3 style="margin:10px 0 6px">Trains & Tatkal</h3>
+          <p style="font-size:13px; color:var(--slate); margin-bottom:14px">Verify official seat availability, RAC, waiting list, and Tatkal fares directly on IRCTC before reserving.</p>
+          <a href="https://www.irctc.co.in" target="_blank" class="badge-tag" style="display:inline-block; padding:8px 12px">Open IRCTC Official Site →</a>
+        </div>
+
+        <div class="card">
+          <span class="verify-badge">Flight Comparison</span>
+          <h3 style="margin:10px 0 6px">Air Travelers</h3>
+          <p style="font-size:13px; color:var(--slate); margin-bottom:14px">Compare direct airline prices vs aggregators (Via.com, MakeMyTrip, EaseMyTrip) to avoid hidden convenience fees.</p>
+          <a href="https://www.via.com" target="_blank" class="badge-tag" style="display:inline-block; padding:8px 12px">Verify via Via.com →</a>
+        </div>
+
+        <div class="card">
+          <span class="verify-badge">Bus Transport</span>
+          <h3 style="margin:10px 0 6px">State & Private Buses</h3>
+          <p style="font-size:13px; color:var(--slate); margin-bottom:14px">Cross-check official State Road Transport Corporation (SRTC) portals with RedBus and AbhiBus schedules.</p>
+          <a href="https://www.redbus.in" target="_blank" class="badge-tag" style="display:inline-block; padding:8px 12px">Verify Bus Routes →</a>
         </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- ══════════════════════════════════════════════
-     PAGE: AGENT DASHBOARD
-══════════════════════════════════════════════ -->
-<div id="page-agent" class="page">
-  <div id="agent-login-view">
-    <div class="agent-login-wrap">
-      <div class="card" style="padding:36px; text-align:center">
-        <div style="font-size:52px; margin-bottom:12px">🔐</div>
-        <h3 style="margin-bottom:4px">Agent Portal</h3>
-        <p style="color:var(--muted); font-size:13px; margin-bottom:24px">Secure login for travel agents and admins</p>
-        <div style="text-align:left; margin-bottom:14px">
-          <label class="field-label">Email</label>
-          <input class="form-field" id="ag-email" placeholder="agent@email.com"/>
+  <!-- PAGE: BENGALURU DAY TRIPS & PILGRIMAGE CIRCUITS -->
+  <div id="page-bengaluru" class="page">
+    <div class="container" style="padding-top:24px">
+      <div class="section-head">
+        <div>
+          <h2>Bengaluru Day Trips & Pilgrimage Circuits</h2>
+          <p style="color:var(--slate); font-size:14px">Getaway guides within 100km, 200km, and 300km of Bengaluru</p>
         </div>
-        <div style="text-align:left; margin-bottom:20px">
-          <label class="field-label">Password</label>
-          <input class="form-field" id="ag-pass" type="password" placeholder="Password"/>
-        </div>
-        <button class="btn-primary" style="width:100%; padding:12px 0; font-size:15px" onclick="agentLogin()">Login to Dashboard</button>
-        <p style="color:var(--muted); font-size:11px; margin-top:14px">Demo: type anything and click Login</p>
       </div>
+      <div class="grid-3" id="blr-grid"></div>
     </div>
   </div>
 
-  <div id="agent-main-view" style="display:none">
-    <div class="container" style="padding-top:24px; padding-bottom:60px">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px">
-        <div class="section-title">👔 Agent Dashboard</div>
-        <button class="btn-outline" style="padding:7px 16px; font-size:13px" onclick="agentLogout()">Logout</button>
-      </div>
-
-      <!-- Stat cards -->
-      <div class="stat-cards" id="agent-stats"></div>
-
-      <!-- Sub-tabs -->
-      <div style="display:flex; gap:0; border-bottom:2px solid var(--steel); margin-bottom:20px; overflow-x:auto">
-        <button class="tab-btn active" onclick="switchAgentTab('leads',this)">👥 Leads</button>
-        <button class="tab-btn" onclick="switchAgentTab('revenue',this)">📊 Revenue</button>
-        <button class="tab-btn" onclick="switchAgentTab('calculator',this)">🧮 Calculator</button>
-        <button class="tab-btn" onclick="switchAgentTab('quotation',this)">📄 Quotation</button>
-      </div>
-
-      <div id="agent-tab-content"></div>
-    </div>
+  <!-- BOTTOM NAV -->
+  <div id="bottom-nav">
+    <button class="bnav-btn active" onclick="showPage('home')" data-page="home"><span>🏠</span>Home</button>
+    <button class="bnav-btn" onclick="showPage('explore')" data-page="explore"><span>🗺️</span>Explore</button>
+    <button class="bnav-btn" onclick="showPage('planner')" data-page="planner"><span>🚌</span>Group Plan</button>
+    <button class="bnav-btn" onclick="showPage('verify')" data-page="verify"><span>✅</span>Verify</button>
+    <button class="bnav-btn" onclick="showPage('bengaluru')" data-page="bengaluru"><span>🚗</span>BLR Trips</button>
   </div>
-</div>
 
-<!-- ══════════════════════════════════════════════
-     FLOATING WA BUTTON
-══════════════════════════════════════════════ -->
-<button id="wa-float" onclick="waContact()">💬</button>
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    /* ── DATA STORES (Mocking JSON structures) ── */
+    const CATEGORIES = [
+      { title: "Hill Stations", icon: "⛰️", count: "42 Destinations" },
+      { title: "Beaches", icon: "🏖️", count: "28 Locations" },
+      { title: "Pilgrimage", icon: "🛕", count: "65 Sacred Sites" },
+      { title: "Weekend Trips", icon: "🚗", count: "100+ Getaways" },
+      { title: "Heritage", icon: "🏰", count: "35 Forts & Monuments" },
+      { title: "Wildlife", icon: "🐅", count: "20 National Parks" },
+      { title: "Temple Tours", icon: "🪔", count: "50 Circuits" },
+      { title: "Solo Travel", icon: "🎒", count: "Safe Guides" }
+    ];
 
-<!-- ══════════════════════════════════════════════
-     BOTTOM NAV
-══════════════════════════════════════════════ -->
-<div id="bottom-nav">
-  <button class="bnav-btn active" onclick="showPage('home')" data-page="home"><span class="bicon">🏠</span>Home</button>
-  <button class="bnav-btn" onclick="showPage('results')" data-page="results"><span class="bicon">🔍</span>Search</button>
-  <button class="bnav-btn" onclick="showPage('itinerary')" data-page="itinerary"><span class="bicon">🤖</span>AI Plan</button>
-  <button class="bnav-btn" onclick="showPage('budget')" data-page="budget"><span class="bicon">💸</span>Budget</button>
-  <button class="bnav-btn" onclick="showPage('packages')" data-page="packages"><span class="bicon">🎁</span>Packages</button>
-  <button class="bnav-btn" onclick="showPage('dashboard')" data-page="dashboard"><span class="bicon">👤</span>My Trips</button>
-</div>
+    const FEATURED_DESTINATIONS = [
+      { name: "Valparai", state: "Tamil Nadu", type: "Hill Station", desc: "Tea estates, hairpin bends, and quiet wildlife spots.", bestTime: "Oct - Mar" },
+      { name: "Gaya & Bodh Gaya", state: "Bihar", type: "Pilgrimage", desc: "Mahabodhi Temple, spiritual tranquility, and ritual guides.", bestTime: "Nov - Feb" },
+      { name: "Coorg", state: "Karnataka", type: "Nature & Coffee", desc: "Misty hills, waterfalls, and Kodava culinary routes.", bestTime: "Oct - Jun" },
+      { name: "Varanasi", state: "Uttar Pradesh", type: "Spiritual Heritage", desc: "Ganga Aarti timing, ghat walks, and temple etiquette.", bestTime: "Oct - Mar" },
+      { name: "Goa", state: "Goa", type: "Beaches & Heritage", desc: "Beyond beaches: Old Goa churches, waterfalls, and spice farms.", bestTime: "Nov - Feb" },
+      { name: "Munnar", state: "Kerala", type: "Hill Station", desc: "Anamudi peak views, tea museum, and green valleys.", bestTime: "Sep - Mar" }
+    ];
 
-<!-- TOAST -->
-<div id="toast"></div>
+    const STATES = [
+      { name: "Karnataka", capital: "Bengaluru", best: "Oct - Mar", popular: "Coorg, Hampi, Mysuru" },
+      { name: "Tamil Nadu", capital: "Chennai", best: "Nov - Mar", popular: "Ooty, Valparai, Madurai" },
+      { name: "Kerala", capital: "Thiruvananthapuram", best: "Sep - Mar", popular: "Munnar, Alleppey, Wayanad" },
+      { name: "Rajasthan", capital: "Jaipur", best: "Oct - Mar", popular: "Jaipur, Udaipur, Jaisalmer" },
+      { name: "Goa", capital: "Panaji", best: "Nov - Feb", popular: "North Goa, South Goa, Dudhsagar" },
+      { name: "Himachal Pradesh", capital: "Shimla", best: "Mar - Jun", popular: "Manali, Shimla, Dharamshala" }
+    ];
 
-<!-- ══════════════════════════════════════════════
-     JAVASCRIPT
-══════════════════════════════════════════════ -->
-<script>
-/* ── DATA ── */
-const FLIGHTS = [
-  { provider:"MakeMyTrip", name:"IndiGo 6E-402",       dep:"06:00", arr:"08:10", dur:"2h 10m", price:3899, bag:"15kg", ref:"Non-Refundable", badges:["Cheapest"] },
-  { provider:"Via.com",    name:"Air India AI-101",     dep:"09:15", arr:"11:05", dur:"1h 50m", price:5499, bag:"25kg", ref:"Free Cancel",    badges:["Fastest","Recommended"] },
-  { provider:"Goibibo",    name:"Akasa Air QP-18",      dep:"12:30", arr:"14:40", dur:"2h 10m", price:4299, bag:"15kg", ref:"₹500 Cancel",    badges:[] },
-  { provider:"EaseMyTrip", name:"SpiceJet SG-22",       dep:"17:00", arr:"19:25", dur:"2h 25m", price:3599, bag:"15kg", ref:"Non-Refundable", badges:[] },
-  { provider:"Yatra",      name:"Air India Exp IX-802", dep:"20:30", arr:"22:30", dur:"2h 00m", price:4799, bag:"20kg", ref:"₹300 Cancel",    badges:[] },
-];
-const TRAINS = [
-  { provider:"IRCTC",      name:"12951 Rajdhani Exp",  dep:"16:25", arr:"08:15+1", dur:"15h 50m", cls:"3A", avail:"AVAILABLE 42", fare:1505, badges:["Recommended"] },
-  { provider:"ConfirmTkt", name:"12009 Shatabdi Exp",  dep:"06:00", arr:"13:55",   dur:"7h 55m",  cls:"CC", avail:"AVAILABLE 118",fare:1140, badges:["Fastest"] },
-  { provider:"RailYatri",  name:"12627 Karnataka Exp", dep:"21:40", arr:"07:10+1", dur:"9h 30m",  cls:"SL", avail:"WL 12",        fare:465,  badges:["Lowest Fare"] },
-  { provider:"Ixigo",      name:"22691 Rajdhani Exp",  dep:"20:00", arr:"10:25+1", dur:"14h 25m", cls:"2A", avail:"AVAILABLE 8",  fare:2210, badges:[] },
-];
-const BUSES = [
-  { provider:"RedBus",  op:"Orange Tours (Volvo A/C)", board:"Dadar 21:00",   drop:"Majestic 06:30",     dur:"9h 30m", seat:"Sleeper",      price:899,  badges:["Recommended"] },
-  { provider:"AbhiBus", op:"VRL Travels (Multi-Axle)", board:"Borivali 22:00",drop:"Satellite 07:00",    dur:"9h",     seat:"Sleeper",      price:749,  badges:["Cheapest"] },
-  { provider:"RedBus",  op:"SRS Travels (Scania A/C)", board:"Andheri 20:30", drop:"Shivajinagar 05:30", dur:"9h",     seat:"Luxury Seat",  price:1199, badges:["Luxury"] },
-  { provider:"KSRTC",   op:"KSRTC Rajahamsa",          board:"CST 19:00",     drop:"Central 05:45",      dur:"10h 45m",seat:"Semi-Sleeper",  price:650,  badges:[] },
-];
-const HOTELS = [
-  { provider:"MakeMyTrip", name:"The Leela Palace",   rating:4.8, type:"5★ Luxury",  price:8500,  tax:1530, cancel:"Free till 24h", amen:["Pool","Spa","Gym","WiFi"], badges:["Best Rated"] },
-  { provider:"Goibibo",    name:"Lemon Tree Premier", rating:4.4, type:"4★ Business", price:3200,  tax:576,  cancel:"Free till 48h", amen:["Gym","WiFi","Restaurant"], badges:["Best Value"] },
-  { provider:"Agoda",      name:"OYO Townhouse Oak",  rating:3.9, type:"Budget",      price:1299,  tax:234,  cancel:"Non-Refundable",amen:["WiFi","AC"],               badges:["Lowest Price"] },
-  { provider:"Booking.com",name:"Marriott Bengaluru", rating:4.7, type:"5★ Premium",  price:11200, tax:2016, cancel:"Free till 24h", amen:["Pool","Spa","Gym","WiFi"], badges:[] },
-  { provider:"Via Hotels", name:"Treebo Trend Suites",rating:4.1, type:"3★",          price:2100,  tax:378,  cancel:"Free till 24h", amen:["WiFi","AC","Restaurant"],  badges:[] },
-];
-const PACKAGES = [
-  { dest:"Goa",       emoji:"🏖️", tagline:"Sun, Sand & Shacks",        days:5, nights:4, price:12999, inc:["4N Hotel","Flights","Beach Tours","Breakfast"],      exc:["Lunch/Dinner","Water Sports Extra"] },
-  { dest:"Kerala",    emoji:"🌴", tagline:"Backwaters & Bliss",          days:7, nights:6, price:16999, inc:["6N Hotel","Flights","Houseboat 1N","All Breakfasts"],exc:["Dinner","Personal Expenses"] },
-  { dest:"Manali",    emoji:"🏔️", tagline:"Snow, Adventure & Freedom",  days:6, nights:5, price:13999, inc:["5N Hotel","Volvo Bus","Rohtang Permit","Sightseeing"],exc:["Flights","Adventure Sports"] },
-  { dest:"Kashmir",   emoji:"❄️", tagline:"Heaven on Earth",            days:7, nights:6, price:21999, inc:["6N Hotel","Flights","Shikara Ride","Sightseeing"],    exc:["Gondola Ride","Personal Expenses"] },
-  { dest:"Varanasi",  emoji:"🕌", tagline:"Spiritual Capital of India", days:4, nights:3, price:8999,  inc:["3N Hotel","Train","Ganga Aarti","Sarnath Tour"],      exc:["Flights","Puja Offerings"] },
-  { dest:"Gaya",      emoji:"🛕", tagline:"Bodh Gaya Pilgrimage",       days:3, nights:2, price:6999,  inc:["2N Hotel","Train","Mahabodhi Temple Tour"],            exc:["Flights","Meals"] },
-  { dest:"Yelagiri",  emoji:"⛰️", tagline:"Hills of Tamil Nadu",        days:4, nights:3, price:7499,  inc:["3N Resort","Bus","Nature Walk","Boating"],             exc:["Meals","Personal Expenses"] },
-  { dest:"Puri",      emoji:"🌊", tagline:"Temple & Sea",               days:4, nights:3, price:8499,  inc:["3N Hotel","Train","Jagannath Darshan","Beach Visit"],  exc:["Flights","Meals"] },
-  { dest:"Ayodhya",   emoji:"🪔", tagline:"Ram Janmabhoomi Pilgrimage", days:3, nights:2, price:5999,  inc:["2N Hotel","Train","Ram Mandir Visit","Saryu Aarti"],   exc:["Flights","Meals"] },
-];
-const AGENT_LEADS = [
-  { id:1, name:"Ramesh Kumar",  dest:"Goa",      date:"2025-08-15", budget:"₹25,000", status:"Hot",    phone:"9876500000", followup:"2025-07-20" },
-  { id:2, name:"Priya Sharma",  dest:"Kerala",   date:"2025-09-01", budget:"₹45,000", status:"Warm",   phone:"8765400000", followup:"2025-07-22" },
-  { id:3, name:"Arun Singh",    dest:"Manali",   date:"2025-08-20", budget:"₹32,000", status:"Cold",   phone:"7654300000", followup:"2025-07-30" },
-  { id:4, name:"Sunita Devi",   dest:"Varanasi", date:"2025-07-25", budget:"₹18,000", status:"Booked", phone:"6543200000", followup:"-" },
-  { id:5, name:"Vijay Mehta",   dest:"Kashmir",  date:"2025-09-15", budget:"₹65,000", status:"Hot",    phone:"5544300000", followup:"2025-07-21" },
-];
-const BUDGET_CATS = [
-  { cat:"Flights",         icon:"✈️", amt:4500 },
-  { cat:"Hotels",          icon:"🏨", amt:3000 },
-  { cat:"Food & Dining",   icon:"🍽️", amt:1500 },
-  { cat:"Local Transport", icon:"🚗", amt:800  },
-  { cat:"Sightseeing",     icon:"🎯", amt:1200 },
-  { cat:"Shopping & Misc", icon:"🛍️", amt:700  },
-];
-const PIE_COLORS = ["#1E88E5","#00BCD4","#00897B","#F9A825","#7B1FA2","#E53935"];
+    const BLR_TRIPS = [
+      { name: "Bengaluru → Nandi Hills", range: "Within 100 km", time: "1.5 Hours", highlight: "Sunrise viewpoint, Fort ruins" },
+      { name: "Bengaluru → Lepakshi", range: "Within 150 km", time: "3 Hours", highlight: "Hanging Pillar, Monolithic Nandi" },
+      { name: "Bengaluru → Tirupati Circuit", range: "Within 250 km", time: "5 Hours", highlight: "Dress code tips, Temple timings" },
+      { name: "Bengaluru → Dharmasthala & Kukke", range: "Within 300 km", time: "6.5 Hours", highlight: "Western Ghats drive, Pilgrimage" }
+    ];
 
-/* ── GLOBALS ── */
-let currentQuery = { from:"Mumbai", to:"Bengaluru", dep:"2025-08-10", ret:"2025-08-15", travelers:2, budget:"" };
-let budgetData = BUDGET_CATS.map(c=>({...c}));
-let budgetChart = null;
-let agentLeads = [...AGENT_LEADS];
-let openPkgIndex = -1;
-
-/* ── NAVIGATION ── */
-function showPage(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + id).classList.add('active');
-  document.querySelectorAll('.bnav-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.page === id);
-  });
-  window.scrollTo(0, 0);
-  if (id === 'budget') initBudget();
-  if (id === 'packages') renderPackages();
-  if (id === 'home') renderHomePkgs();
-}
-
-function toggleMenu() {
-  const m = document.getElementById('mobile-menu');
-  m.style.display = m.style.display === 'block' ? 'none' : 'block';
-}
-
-function toggleDark() {
-  document.body.classList.toggle('dark');
-  document.getElementById('darkBtn').textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
-}
-
-function waContact(msg) {
-  const m = msg || 'Hello DigiTravel Team, I would like assistance with my trip planning.';
-  window.open('https://wa.me/919999999999?text=' + encodeURIComponent(m), '_blank');
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
-}
-
-/* ── BADGE HTML ── */
-function badgeHTML(b) {
-  const map = { Cheapest:'cheap', Fastest:'fast', Recommended:'rec', Luxury:'luxury',
-    'Best Rated':'rated', 'Best Value':'value', 'Lowest Price':'low', 'Lowest Fare':'low',
-    Hot:'hot', Warm:'warm', Cold:'cold', Booked:'booked' };
-  return `<span class="badge badge-${map[b]||'rec'}">${b}</span>`;
-}
-
-/* ── SEARCH ── */
-function doSearch() {
-  currentQuery = {
-    from:      document.getElementById('s-from').value || 'Mumbai',
-    to:        document.getElementById('s-to').value   || 'Bengaluru',
-    dep:       document.getElementById('s-dep').value,
-    ret:       document.getElementById('s-ret').value,
-    travelers: document.getElementById('s-pax').value,
-    budget:    document.getElementById('s-budget').value,
-  };
-  showPage('results');
-  document.getElementById('query-summary').innerHTML =
-    `✈️ <strong>${currentQuery.from}</strong> → <strong>${currentQuery.to}</strong> &nbsp;·&nbsp; ${currentQuery.dep}${currentQuery.ret?' to '+currentQuery.ret:''} &nbsp;·&nbsp; ${currentQuery.travelers} traveler${currentQuery.travelers>1?'s':''}${currentQuery.budget?' &nbsp;·&nbsp; Budget ₹'+Number(currentQuery.budget).toLocaleString():''}`;
-  switchResultTab('flights', document.querySelector('#page-results .tab-btn'));
-}
-
-function switchResultTab(type, btn) {
-  document.querySelectorAll('#page-results .tab-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-  const map = { flights:FLIGHTS, trains:TRAINS, buses:BUSES, hotels:HOTELS };
-  const data = map[type];
-  document.getElementById('result-count').textContent = data.length + ' results found';
-  document.getElementById('results-container').innerHTML = data.map(d => renderResultCard(type, d)).join('');
-}
-
-function renderResultCard(type, d) {
-  let inner = '';
-  if (type === 'flights') {
-    inner = `
-      <div style="min-width:140px">
-        <div class="result-provider">${d.provider}</div>
-        <div class="result-name">${d.name}</div>
-        <div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap">${d.badges.map(badgeHTML).join('')}</div>
-      </div>
-      <div style="flex:1;display:flex;gap:16px;align-items:center;flex-wrap:wrap">
-        <div style="text-align:center"><div class="result-time">${d.dep}</div><div style="font-size:11px;color:var(--muted)">Depart</div></div>
-        <div class="result-dur">───<br>${d.dur}<br>───</div>
-        <div style="text-align:center"><div class="result-time">${d.arr}</div><div style="font-size:11px;color:var(--muted)">Arrive</div></div>
-        <div class="result-info">🧳 ${d.bag}<br>↩ ${d.ref}</div>
-      </div>`;
-  } else if (type === 'trains') {
-    const avC = d.avail.startsWith('WL') ? 'var(--rose)' : 'var(--green)';
-    inner = `
-      <div style="min-width:160px">
-        <div class="result-provider">${d.provider}</div>
-        <div class="result-name">${d.name}</div>
-        <div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap">${d.badges.map(badgeHTML).join('')}</div>
-      </div>
-      <div style="flex:1;display:flex;gap:16px;align-items:center;flex-wrap:wrap">
-        <div style="text-align:center"><div class="result-time">${d.dep}</div><div style="font-size:11px;color:var(--muted)">Depart</div></div>
-        <div class="result-dur">───<br>${d.dur}<br>───</div>
-        <div style="text-align:center"><div class="result-time">${d.arr}</div><div style="font-size:11px;color:var(--muted)">Arrive</div></div>
-        <div class="result-info">Class: <strong>${d.cls}</strong><br><span style="color:${avC};font-weight:700">${d.avail}</span></div>
-      </div>`;
-  } else if (type === 'buses') {
-    inner = `
-      <div style="min-width:180px">
-        <div class="result-provider">${d.provider}</div>
-        <div class="result-name">${d.op}</div>
-        <div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap">${d.badges.map(badgeHTML).join('')}</div>
-      </div>
-      <div style="flex:1;font-size:13px;color:var(--slate)">
-        <div>🚏 Board: <strong>${d.board}</strong></div>
-        <div style="margin-top:4px">📍 Drop: <strong>${d.drop}</strong></div>
-        <div style="margin-top:4px">⏱ ${d.dur} &nbsp;·&nbsp; 💺 ${d.seat}</div>
-      </div>`;
-  } else {
-    inner = `
-      <div style="width:90px;height:72px;background:linear-gradient(135deg,var(--navy),var(--sky));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0">🏨</div>
-      <div style="flex:1">
-        <div class="result-provider">${d.provider}</div>
-        <div class="result-name">${d.name}</div>
-        <div style="margin-top:4px;font-size:13px;color:var(--slate)">${'★'.repeat(Math.floor(d.rating))} ${d.rating} &nbsp;·&nbsp; ${d.type}</div>
-        <div style="display:flex;gap:5px;margin-top:5px;flex-wrap:wrap">${d.amen.map(a=>`<span style="background:var(--ice);color:var(--slate);font-size:11px;padding:2px 8px;border-radius:6px;font-weight:600">${a}</span>`).join('')}</div>
-        <div style="font-size:12px;color:${d.cancel==='Non-Refundable'?'var(--rose)':'var(--green)'};font-weight:700;margin-top:5px">↩ ${d.cancel}</div>
-        <div style="display:flex;gap:5px;margin-top:5px;flex-wrap:wrap">${d.badges.map(badgeHTML).join('')}</div>
-      </div>`;
-  }
-
-  const price = type === 'hotels' ? d.price + d.tax : (d.price || d.fare);
-  const label = type === 'hotels' ? 'per night incl. taxes' : 'per person';
-  const waMsg = `Hi DigiTravel! I want to book ${d.name||d.op||d.provider} for ₹${price.toLocaleString()}. From: ${currentQuery.from}, To: ${currentQuery.to}, Date: ${currentQuery.dep}`;
-
-  return `
-    <div class="result-card">
-      ${inner}
-      <div style="text-align:right;min-width:140px">
-        <div class="result-price">₹${price.toLocaleString()}</div>
-        <div class="result-price-label">${label}</div>
-        <div class="result-actions">
-          <button class="btn-wa" style="padding:7px 12px;font-size:12px" onclick="waContact('${waMsg.replace(/'/g,"\\'")}')">💬 Enquire</button>
-          <button class="btn-primary" style="padding:7px 14px;font-size:13px">Book →</button>
-        </div>
-      </div>
-    </div>`;
-}
-
-/* ── AI ITINERARY ── */
-async function generateItinerary() {
-  const dest   = document.getElementById('it-dest').value;
-  const days   = document.getElementById('it-days').value;
-  const budget = document.getElementById('it-budget').value;
-  const style  = document.getElementById('it-style').value;
-
-  document.getElementById('it-loading').style.display = 'block';
-  document.getElementById('it-output').innerHTML = '';
-
-  // ════════════════════════════════════════════════
-  // 🔑 REPLACE YOUR CLAUDE API KEY HERE
-  // Get free API key at: https://console.anthropic.com
-  // ════════════════════════════════════════════════
-  const CLAUDE_API_KEY = 'YOUR_CLAUDE_API_KEY';
-
-  // If no API key, use demo data
-  if (CLAUDE_API_KEY === 'YOUR_CLAUDE_API_KEY') {
-    await new Promise(r => setTimeout(r, 1800)); // simulate loading
-    document.getElementById('it-loading').style.display = 'none';
-    renderItinerary(getDemoItinerary(dest, days, budget, style));
-    return;
-  }
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': CLAUDE_API_KEY,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 2500,
-        messages: [{ role: 'user', content:
-`Create a ${days}-day ${style} travel itinerary for ${dest} with total budget ₹${budget}.
-Return ONLY valid JSON, no markdown:
-{"title":"catchy title","summary":"2 sentence overview","bestTime":"best season","budgetBreakdown":{"flights":N,"hotels":N,"food":N,"transport":N,"activities":N},"flightTip":"brief tip with price","trainTip":"brief tip with price","busTip":"brief tip","hotelSuggestions":[{"name":"hotel","type":"budget/mid/luxury","pricePerNight":N}],"days":[{"day":1,"title":"day title","morning":"activity","lunch":"spot","afternoon":"activity","dinner":"spot","transport":"how to get around","cost":N,"tip":"insider tip"}],"packingList":["item1","item2","item3","item4","item5"],"localAttractions":["place1","place2","place3"]}`
-        }]
-      })
-    });
-    const data = await res.json();
-    const raw  = data.content?.map(b => b.text || '').join('') || '';
-    const itin = JSON.parse(raw.replace(/```json|```/g, '').trim());
-    document.getElementById('it-loading').style.display = 'none';
-    renderItinerary(itin, dest, days, budget, style);
-  } catch(e) {
-    document.getElementById('it-loading').style.display = 'none';
-    document.getElementById('it-output').innerHTML = `<div style="color:var(--rose);text-align:center;padding:32px">⚠️ Generation failed. Please check your API key and try again.</div>`;
-  }
-}
-
-function getDemoItinerary(dest, days, budget, style) {
-  return {
-    title: `${days} Days in ${dest} — ${style} Edition`,
-    summary: `A perfectly crafted ${style.toLowerCase()} trip to ${dest}. Explore local culture, food, and attractions within your ₹${Number(budget).toLocaleString()} budget.`,
-    bestTime: "October to March",
-    budgetBreakdown: { flights: Math.round(budget*.35), hotels: Math.round(budget*.25), food: Math.round(budget*.20), transport: Math.round(budget*.10), activities: Math.round(budget*.10) },
-    flightTip: `IndiGo or SpiceJet flights from major cities, typically ₹3,500–₹6,000 return`,
-    trainTip: `Rajdhani / Shatabdi Express — comfortable and affordable at ₹800–₹2,000`,
-    busTip: `Volvo A/C overnight buses from nearby cities at ₹600–₹1,200`,
-    hotelSuggestions: [
-      { name:"Budget Guesthouse", type:"Budget", pricePerNight: Math.round(budget*.04) },
-      { name:"3-Star Hotel", type:"Mid-range", pricePerNight: Math.round(budget*.07) },
-      { name:"Luxury Resort", type:"Luxury", pricePerNight: Math.round(budget*.15) }
-    ],
-    days: Array.from({length: Math.min(Number(days),5)}, (_,i) => ({
-      day: i+1,
-      title: ["Arrive & Explore","Local Culture Day","Adventure Day","Relaxation Day","Departure Day"][i],
-      morning: `Visit the main local attraction and take in the morning atmosphere`,
-      lunch: `Try the local specialty at a popular restaurant`,
-      afternoon: `Explore markets, museums or natural spots in the area`,
-      dinner: `Enjoy a traditional dinner with local flavors`,
-      transport: `Auto-rickshaw or local bus (₹100–300/day)`,
-      cost: Math.round(budget / Math.min(Number(days),5)),
-      tip: `Book ahead for popular spots; carry cash for local vendors`
-    })),
-    packingList: ["ID Proof","Comfortable Shoes","Sunscreen","Power Bank","Light Jacket","Water Bottle"],
-    localAttractions: [`${dest} Heritage Site`, `Local Market`, `Nature Park or Beach`]
-  };
-}
-
-function renderItinerary(itin, dest, days, budget, style) {
-  const dayColors = ["#EFF6FF","#F0FDF4","#FFF7ED","#FDF4FF","#FFFBEB","#F0F9FF","#FEF2F2"];
-
-  let budgetRows = '';
-  let bdTotal = 0;
-  const pieCats = [];
-  const pieVals = [];
-  if (itin.budgetBreakdown) {
-    Object.entries(itin.budgetBreakdown).forEach(([k,v],i) => {
-      bdTotal += Number(v);
-      pieCats.push(k);
-      pieVals.push(v);
-      budgetRows += `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--steel)">
-        <span style="color:var(--slate);text-transform:capitalize;font-size:14px">
-          <span style="display:inline-block;width:10px;height:10px;background:${PIE_COLORS[i%6]};border-radius:3px;margin-right:8px;vertical-align:middle"></span>${k}
-        </span>
-        <span style="font-weight:800">₹${Number(v).toLocaleString()}</span>
-      </div>`;
-    });
-  }
-
-  const hotelRows = (itin.hotelSuggestions||[]).map(h => `
-    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--steel)">
-      <div><div style="font-weight:700;font-size:14px">${h.name}</div><div style="font-size:12px;color:var(--muted)">${h.type}</div></div>
-      <div style="font-weight:800;color:var(--royal)">₹${Number(h.pricePerNight||0).toLocaleString()}/night</div>
-    </div>`).join('');
-
-  const dayCards = (itin.days||[]).map((d,i) => `
-    <div class="day-card" style="background:${dayColors[i%7]}">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:6px">
-        <div><span class="day-badge">Day ${d.day}</span><h4 style="font-size:17px;margin-top:6px">${d.title}</h4></div>
-        <div style="text-align:right"><div style="font-size:18px;font-weight:900;color:var(--royal)">₹${Number(d.cost||0).toLocaleString()}</div><div style="font-size:11px;color:var(--muted)">est. spend</div></div>
-      </div>
-      <div class="day-grid">
-        ${d.morning  ? `<div class="day-section"><div class="day-section-title" style="color:var(--sky)">🌅 Morning</div><div class="day-section-body">${d.morning}</div></div>` : ''}
-        ${d.lunch    ? `<div class="day-section"><div class="day-section-title" style="color:var(--green)">🍛 Lunch</div><div class="day-section-body">${d.lunch}</div></div>` : ''}
-        ${d.afternoon? `<div class="day-section"><div class="day-section-title" style="color:var(--purple)">🌇 Afternoon</div><div class="day-section-body">${d.afternoon}</div></div>` : ''}
-        ${d.dinner   ? `<div class="day-section"><div class="day-section-title" style="color:var(--navy)">🌙 Dinner</div><div class="day-section-body">${d.dinner}</div></div>` : ''}
-      </div>
-      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-        ${d.transport?`<span style="background:rgba(21,101,192,.12);color:var(--royal);border-radius:8px;padding:4px 12px;font-size:12px;font-weight:700">🚗 ${d.transport}</span>`:''}
-        ${d.tip?`<span style="background:rgba(249,168,37,.15);color:#B45309;border-radius:8px;padding:4px 12px;font-size:12px;font-weight:700">💡 ${d.tip}</span>`:''}
-      </div>
-    </div>`).join('');
-
-  const waMsg = `Hello DigiTravel! I'd like to plan a ${days||''}-day ${style||''} trip to ${dest||itin.title} with budget ₹${Number(budget||0).toLocaleString()}. Please share a quote.`;
-
-  document.getElementById('it-output').innerHTML = `
-    <!-- Header -->
-    <div class="card" style="padding:24px;margin-bottom:20px">
-      <h2 style="font-size:22px;margin-bottom:6px">${itin.title}</h2>
-      <p style="color:var(--slate);line-height:1.7;margin-bottom:14px">${itin.summary}</p>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <span class="tag" style="background:rgba(21,101,192,.1);color:var(--royal)">📅 ${days||'?'} Days</span>
-        <span class="tag" style="background:rgba(123,31,162,.1);color:var(--purple)">👥 ${style||''}</span>
-        <span class="tag" style="background:rgba(0,137,123,.1);color:var(--green)">💰 ₹${Number(budget||0).toLocaleString()}</span>
-        ${itin.bestTime?`<span class="tag" style="background:rgba(249,168,37,.1);color:var(--amber)">🌤️ ${itin.bestTime}</span>`:''}
-      </div>
-    </div>
-
-    <!-- Budget breakdown -->
-    ${itin.budgetBreakdown?`
-    <div class="card" style="padding:24px;margin-bottom:20px">
-      <h4 style="font-size:15px;margin-bottom:16px">💼 Budget Breakdown</h4>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
-        <div>${budgetRows}</div>
-        <canvas id="itin-pie" height="160"></canvas>
-      </div>
-    </div>`:''}
-
-    <!-- Travel options -->
-    <div class="card" style="padding:24px;margin-bottom:20px">
-      <h4 style="font-size:15px;margin-bottom:16px">🚀 Getting There</h4>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
-        ${itin.flightTip?`<div style="background:var(--ice);border-radius:12px;padding:14px"><div style="font-weight:800;color:var(--navy);margin-bottom:4px">✈️ Flight</div><div style="color:var(--slate);font-size:13px;line-height:1.5">${itin.flightTip}</div></div>`:''}
-        ${itin.trainTip ?`<div style="background:var(--ice);border-radius:12px;padding:14px"><div style="font-weight:800;color:var(--navy);margin-bottom:4px">🚄 Train</div><div style="color:var(--slate);font-size:13px;line-height:1.5">${itin.trainTip}</div></div>`:''}
-        ${itin.busTip   ?`<div style="background:var(--ice);border-radius:12px;padding:14px"><div style="font-weight:800;color:var(--navy);margin-bottom:4px">🚌 Bus</div><div style="color:var(--slate);font-size:13px;line-height:1.5">${itin.busTip}</div></div>`:''}
-      </div>
-    </div>
-
-    <!-- Day cards -->
-    <h4 style="font-size:16px;margin-bottom:14px">📅 Day-by-Day Plan</h4>
-    ${dayCards}
-
-    <!-- Hotels + Packing -->
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin-bottom:20px">
-      ${hotelRows?`<div class="card" style="padding:20px"><h4 style="font-size:15px;margin-bottom:14px">🏨 Recommended Hotels</h4>${hotelRows}</div>`:''}
-      ${itin.packingList?.length?`<div class="card" style="padding:20px"><h4 style="font-size:15px;margin-bottom:14px">🎒 Packing Essentials</h4><div style="display:flex;flex-wrap:wrap;gap:7px">${itin.packingList.map(item=>`<span style="background:var(--ice);color:var(--navy);border-radius:8px;padding:4px 10px;font-size:12px;font-weight:600">${item}</span>`).join('')}</div></div>`:''}
-      ${itin.localAttractions?.length?`<div class="card" style="padding:20px"><h4 style="font-size:15px;margin-bottom:14px">📍 Must-Visit</h4>${itin.localAttractions.map(a=>`<div style="color:var(--slate);font-size:14px;padding:5px 0;border-bottom:1px solid var(--steel)">📌 ${a}</div>`).join('')}</div>`:''}
-    </div>
-
-    <!-- CTA -->
-    <div style="display:flex;gap:12px;flex-wrap:wrap">
-      <button class="btn-wa" style="padding:12px 24px" onclick="waContact('${waMsg.replace(/'/g,"\\'")}')">💬 Get Quote on WhatsApp</button>
-      <button class="btn-outline" style="padding:12px 24px" onclick="window.print()">🖨️ Print Itinerary</button>
-      <button class="btn-outline" style="padding:12px 24px;border-color:var(--green);color:var(--green)" onclick="saveItinerary()">💾 Save Trip</button>
-    </div>
-  `;
-
-  // Draw pie chart
-  if (itin.budgetBreakdown) {
-    setTimeout(() => {
-      const ctx = document.getElementById('itin-pie');
-      if (ctx) new Chart(ctx, {
-        type: 'pie',
-        data: { labels: pieCats, datasets: [{ data: pieVals, backgroundColor: PIE_COLORS }] },
-        options: { responsive:true, plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:c=>`₹${Number(c.parsed).toLocaleString()}` }}}}
-      });
-    }, 100);
-  }
-}
-
-/* ── BUDGET CALCULATOR ── */
-let bChartInstance = null;
-function initBudget() {
-  document.getElementById('budget-inputs').innerHTML = budgetData.map((item, i) => `
-    <div class="budget-row card" style="padding:12px 16px">
-      <span style="font-size:22px;min-width:28px">${item.icon}</span>
-      <span style="flex:1;font-weight:700;font-size:14px">${item.cat}</span>
-      <div style="display:flex;align-items:center;gap:6px">
-        <span style="color:var(--muted);font-weight:700">₹</span>
-        <input type="number" value="${item.amt}" min="0"
-          style="width:90px;border:1.5px solid var(--steel);border-radius:8px;padding:6px 8px;font-size:14px;font-weight:800;color:var(--navy);background:var(--ice);text-align:right;outline:none"
-          oninput="budgetData[${i}].amt=Math.max(0,Number(this.value));calcBudget()"/>
-      </div>
-      <span style="color:var(--muted);font-size:11px;min-width:50px">/ person</span>
-    </div>`).join('');
-  calcBudget();
-}
-
-function calcBudget() {
-  const pax    = Math.max(1, Number(document.getElementById('b-pax')?.value||2));
-  const nights = Math.max(1, Number(document.getElementById('b-nights')?.value||4));
-  const perPerson = budgetData.reduce((s,x)=>s+Number(x.amt),0);
-  const total     = perPerson * pax;
-  const perDay    = Math.round(total / nights);
-
-  document.getElementById('budget-summary').innerHTML = `
-    <div class="budget-total-row" style="border-bottom:1px solid rgba(255,255,255,.1)">
-      <span style="opacity:.8;font-size:14px">Per Person</span>
-      <span style="font-weight:900;font-size:18px">₹${perPerson.toLocaleString()}</span>
-    </div>
-    <div class="budget-total-row" style="border-bottom:1px solid rgba(255,255,255,.1)">
-      <span style="opacity:.8;font-size:14px">Per Day Total</span>
-      <span style="font-weight:900;font-size:18px">₹${perDay.toLocaleString()}</span>
-    </div>
-    <div class="budget-total-row">
-      <span style="opacity:.8;font-size:16px">Grand Total</span>
-      <span style="font-weight:900;font-size:26px">₹${total.toLocaleString()}</span>
-    </div>`;
-
-  const ctx = document.getElementById('budgetChart');
-  if (!ctx) return;
-  if (bChartInstance) bChartInstance.destroy();
-  bChartInstance = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: budgetData.map(x=>x.cat),
-      datasets:[{ data: budgetData.map(x=>x.amt*pax), backgroundColor: PIE_COLORS, borderWidth:2 }]
-    },
-    options: {
-      responsive:true,
-      plugins: {
-        legend:{ position:'bottom', labels:{ font:{ size:11 }, boxWidth:12 }},
-        tooltip:{ callbacks:{ label: c => `₹${Number(c.parsed).toLocaleString()}` }}
-      }
+    /* ── APPLICATION LOGIC ── */
+    function init() {
+      renderCategories();
+      renderFeatured();
+      renderStates();
+      renderBLR();
+      renderSeatMap();
     }
-  });
-}
 
-/* ── PACKAGES ── */
-function renderPackages() {
-  document.getElementById('pkg-grid').innerHTML = PACKAGES.map((p,i)=>`
-    <div class="pkg-card">
-      <div class="pkg-img">
-        <span class="pkg-emoji">${p.emoji}</span>
-        <span class="pkg-duration">${p.nights}N / ${p.days}D</span>
-      </div>
-      <div class="pkg-body">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
-          <div>
-            <div class="pkg-title">${p.dest}</div>
-            <div class="pkg-tagline">${p.tagline}</div>
-          </div>
-          <div style="text-align:right">
-            <div class="pkg-price">₹${p.price.toLocaleString()}</div>
-            <div class="pkg-price-label">per person</div>
-          </div>
-        </div>
-        <div id="pkg-details-${i}" style="display:none;margin:12px 0">
-          <div style="font-size:13px;font-weight:800;color:var(--green);margin-bottom:4px">✓ Inclusions</div>
-          ${p.inc.map(x=>`<div style="color:var(--slate);font-size:12px;margin-bottom:2px">• ${x}</div>`).join('')}
-          <div style="font-size:13px;font-weight:800;color:var(--rose);margin-top:8px;margin-bottom:4px">✗ Exclusions</div>
-          ${p.exc.map(x=>`<div style="color:var(--slate);font-size:12px;margin-bottom:2px">• ${x}</div>`).join('')}
-        </div>
-        <button onclick="togglePkg(${i})" id="pkg-toggle-${i}" style="background:none;border:none;color:var(--sky);font-size:12px;font-weight:700;cursor:pointer;padding:4px 0;margin-bottom:10px">▼ View Details</button>
-        <div style="display:flex;gap:8px">
-          <button class="btn-wa" style="flex:1;padding:9px 0;font-size:12px" onclick="waContact('Hi DigiTravel! I am interested in the ${p.dest} package (${p.nights}N/${p.days}D) for ₹${p.price.toLocaleString()} per person.')">💬 Enquire</button>
-          <button class="btn-primary" style="flex:1;padding:9px 0;font-size:12px" onclick="showToast('📋 Booking form coming soon!')">Book Now</button>
-        </div>
-      </div>
-    </div>`).join('');
-}
-
-function togglePkg(i) {
-  const d = document.getElementById(`pkg-details-${i}`);
-  const b = document.getElementById(`pkg-toggle-${i}`);
-  const open = d.style.display === 'block';
-  d.style.display = open ? 'none' : 'block';
-  b.textContent = open ? '▼ View Details' : '▲ Hide Details';
-}
-
-function renderHomePkgs() {
-  const el = document.getElementById('home-pkg-grid');
-  if (!el) return;
-  el.innerHTML = PACKAGES.slice(0,6).map(p=>`
-    <div onclick="showPage('packages')" style="background:var(--ice);border:1.5px solid var(--steel);border-radius:14px;padding:16px;cursor:pointer;text-align:center">
-      <div style="font-size:48px;margin-bottom:8px">${p.emoji}</div>
-      <div style="font-weight:800;font-size:15px">${p.dest}</div>
-      <div style="color:var(--muted);font-size:11px;margin:2px 0 6px">${p.nights}N/${p.days}D</div>
-      <div style="font-weight:900;color:var(--royal)">₹${p.price.toLocaleString()}</div>
-    </div>`).join('');
-}
-
-/* ── AGENT DASHBOARD ── */
-function agentLogin() {
-  document.getElementById('agent-login-view').style.display = 'none';
-  document.getElementById('agent-main-view').style.display  = 'block';
-  renderAgentStats();
-  switchAgentTab('leads', document.querySelector('#page-agent .tab-btn'));
-}
-
-function agentLogout() {
-  document.getElementById('agent-login-view').style.display = 'block';
-  document.getElementById('agent-main-view').style.display  = 'none';
-}
-
-function renderAgentStats() {
-  document.getElementById('agent-stats').innerHTML = [
-    { label:"Total Leads",      v:"247",   icon:"👥", c:"var(--sky)"   },
-    { label:"Bookings Done",    v:"89",    icon:"📋", c:"var(--green)" },
-    { label:"Monthly Revenue",  v:"₹1.8L", icon:"💰", c:"var(--amber)" },
-    { label:"Pending Payments", v:"₹24K",  icon:"⏳", c:"var(--rose)"  },
-    { label:"Avg Commission",   v:"₹8.2K", icon:"🏆", c:"var(--purple)"},
-  ].map(s=>`
-    <div class="card stat-card">
-      <div class="stat-icon" style="background:${s.c}22">${s.icon}</div>
-      <div><div class="stat-number">${s.v}</div><div class="stat-label">${s.label}</div></div>
-    </div>`).join('');
-}
-
-let agentChartInst = null;
-function switchAgentTab(tab, btn) {
-  document.querySelectorAll('#page-agent .tab-btn').forEach(b=>b.classList.remove('active'));
-  if(btn) btn.classList.add('active');
-  const el = document.getElementById('agent-tab-content');
-
-  if (tab === 'leads') {
-    el.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
-        <span style="font-size:14px;color:var(--slate)">${agentLeads.length} leads total</span>
-        <button class="btn-primary" style="padding:8px 18px;font-size:13px" onclick="toggleAddLead()">+ Add Lead</button>
-      </div>
-      <div id="add-lead-form" style="display:none" class="card" style="padding:20px;margin-bottom:16px">
-        <h5 style="margin-bottom:14px">New Lead</h5>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-          <input class="form-field" id="nl-name" placeholder="Customer Name"/>
-          <input class="form-field" id="nl-dest" placeholder="Destination"/>
-          <input class="form-field" id="nl-date" type="date" placeholder="Travel Date"/>
-          <input class="form-field" id="nl-budget" placeholder="Budget e.g. ₹25,000"/>
-          <input class="form-field" id="nl-phone" placeholder="Phone Number"/>
-          <select class="form-field" id="nl-status">
-            <option>Hot</option><option>Warm</option><option>Cold</option>
-          </select>
-        </div>
-        <button class="btn-primary" style="padding:9px 22px" onclick="addLead()">Save Lead</button>
-      </div>
-      <div class="table-wrap">
-        <table class="data-table">
-          <thead><tr><th>Customer</th><th>Destination</th><th>Date</th><th>Budget</th><th>Status</th><th>Action</th></tr></thead>
-          <tbody id="leads-tbody"></tbody>
-        </table>
-      </div>`;
-    renderLeadsTable();
-
-  } else if (tab === 'revenue') {
-    el.innerHTML = `<div class="card" style="padding:24px">
-      <h4 style="margin-bottom:20px">📊 Monthly Revenue Trend</h4>
-      <canvas id="revenueChart" height="280"></canvas>
-    </div>`;
-    setTimeout(() => {
-      const ctx = document.getElementById('revenueChart');
-      if (!ctx) return;
-      if (agentChartInst) agentChartInst.destroy();
-      agentChartInst = new Chart(ctx, {
-        type:'bar',
-        data: {
-          labels:['Jan','Feb','Mar','Apr','May','Jun'],
-          datasets:[{ label:'Revenue (₹)', data:[82000,95000,71000,110000,143000,180000],
-            backgroundColor:'rgba(30,136,229,.75)', borderRadius:6 }]
-        },
-        options:{ responsive:true, plugins:{ legend:{ display:false } },
-          scales:{ y:{ ticks:{ callback:v=>`₹${(v/1000).toFixed(0)}K` }}}}
+    function showPage(id) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-' + id).classList.add('active');
+      document.querySelectorAll('.nav-btn, .bnav-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.page === id);
       });
-    }, 100);
+      window.scrollTo(0, 0);
+    }
 
-  } else if (tab === 'calculator') {
-    el.innerHTML = `
-      <div style="max-width:480px">
-        <h4 style="margin-bottom:18px">💰 Commission & Profit Calculator</h4>
-        ${['Package Price (₹)','Travelers','Commission %'].map((l,i)=>`
-          <div style="margin-bottom:14px">
-            <label class="field-label">${l}</label>
-            <input class="form-field" id="comm-${i}" type="number" value="${[25000,2,10][i]}" oninput="calcComm()"/>
-          </div>`).join('')}
-        <div id="comm-result" style="margin-top:20px"></div>
-      </div>`;
-    calcComm();
+    function toggleDark() {
+      document.body.classList.toggle('dark');
+    }
 
-  } else if (tab === 'quotation') {
-    el.innerHTML = `
-      <div style="max-width:600px">
-        <h4 style="margin-bottom:18px">📄 Quick Quotation Generator</h4>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
-          <div><label class="field-label">Customer Name</label><input class="form-field" id="q-name" placeholder="Ramesh Kumar"/></div>
-          <div><label class="field-label">Destination</label><input class="form-field" id="q-dest" placeholder="Goa"/></div>
-          <div><label class="field-label">Travel Date</label><input class="form-field" id="q-date" type="date"/></div>
-          <div><label class="field-label">Travelers</label><input class="form-field" id="q-pax" type="number" value="2" min="1"/></div>
-          <div><label class="field-label">Package Price (₹)</label><input class="form-field" id="q-price" type="number" value="15000"/></div>
-          <div><label class="field-label">Inclusions</label><input class="form-field" id="q-inc" placeholder="Hotel, Flights, Meals"/></div>
+    function renderCategories() {
+      document.getElementById('cat-grid').innerHTML = CATEGORIES.map(c => `
+        <div class="card" style="cursor:pointer" onclick="quickSearch('${c.title}')">
+          <div style="font-size:32px; margin-bottom:8px">${c.icon}</div>
+          <div class="card-title">${c.title}</div>
+          <div class="card-sub">${c.count}</div>
         </div>
-        <button class="btn-primary" style="padding:10px 24px" onclick="generateQuotation()">Generate Quotation</button>
-        <div id="quotation-output" style="margin-top:20px"></div>
-      </div>`;
-  }
-}
+      `).join('');
+    }
 
-function toggleAddLead() {
-  const f = document.getElementById('add-lead-form');
-  f.style.display = f.style.display === 'block' ? 'none' : 'block';
-}
+    function renderFeatured() {
+      document.getElementById('featured-dest-grid').innerHTML = FEATURED_DESTINATIONS.map(d => `
+        <div class="card">
+          <span class="badge-tag">${d.type}</span>
+          <h3 style="margin:10px 0 4px">${d.name}</h3>
+          <div style="font-size:12px; color:var(--slate); margin-bottom:8px">${d.state} &bull; Best: ${d.bestTime}</div>
+          <p style="font-size:13px; color:var(--slate); margin-bottom:14px">${d.desc}</p>
+          <button class="badge-tag" style="background:var(--primary); color:#FFF; border:none; padding:8px 12px; cursor:pointer">Explore Knowledge Guide →</button>
+        </div>
+      `).join('');
+    }
 
-function addLead() {
-  const n = document.getElementById('nl-name').value;
-  if (!n) { showToast('⚠️ Enter customer name'); return; }
-  agentLeads.push({
-    id: agentLeads.length+1,
-    name:   n,
-    dest:   document.getElementById('nl-dest').value,
-    date:   document.getElementById('nl-date').value,
-    budget: document.getElementById('nl-budget').value,
-    phone:  document.getElementById('nl-phone').value,
-    status: document.getElementById('nl-status').value,
-    followup: '-'
-  });
-  toggleAddLead();
-  renderLeadsTable();
-  showToast('✅ Lead saved!');
+    function renderStates() {
+      document.getElementById('states-grid').innerHTML = STATES.map(s => `
+        <div class="card">
+          <h3 class="card-title">${s.name}</h3>
+          <div style="font-size:12px; color:var(--slate); margin-bottom:6px">Capital: <strong>${s.capital}</strong></div>
+          <div style="font-size:12px; color:var(--slate); margin-bottom:10px">Best Time: ${s.best}</div>
+          <p style="font-size:12px; color:var(--slate)">Places: ${s.popular}</p>
+        </div>
+      `).join('');
+    }
 
-  // Save to Firebase
-  if (window._db && window._fb) {
-    window._fb.addDoc(window._fb.collection(window._db, 'leads'), agentLeads[agentLeads.length-1])
-      .catch(e => console.log('Firebase save failed (check config):', e));
-  }
-}
+    function renderBLR() {
+      document.getElementById('blr-grid').innerHTML = BLR_TRIPS.map(t => `
+        <div class="card">
+          <span class="badge-tag">${t.range}</span>
+          <h3 style="margin:10px 0 4px">${t.name}</h3>
+          <div style="font-size:12px; color:var(--slate); margin-bottom:8px">Drive Time: ${t.time}</div>
+          <p style="font-size:13px; color:var(--slate)">Highlights: ${t.highlight}</p>
+        </div>
+      `).join('');
+    }
 
-function renderLeadsTable() {
-  const statusMap = { Hot:'hot', Warm:'warm', Cold:'cold', Booked:'booked' };
-  document.getElementById('leads-tbody').innerHTML = agentLeads.map(l=>`
-    <tr>
-      <td><div style="font-weight:800">${l.name}</div><div style="color:var(--muted);font-size:12px">${l.phone}</div></td>
-      <td style="font-weight:600">${l.dest}</td>
-      <td style="color:var(--slate)">${l.date}</td>
-      <td style="font-weight:800">${l.budget}</td>
-      <td><span class="badge badge-${statusMap[l.status]||'rec'}">${l.status}</span></td>
-      <td>
-        <button style="background:var(--wa);color:#fff;border:none;border-radius:8px;padding:5px 12px;font-size:12px;cursor:pointer;font-weight:700"
-          onclick="waContact('Hello ${l.name.replace(/'/g,"\\'")}! This is DigiTravel regarding your ${l.dest} trip inquiry. Are you still interested?')">💬 WA</button>
-      </td>
-    </tr>`).join('');
-}
+    function renderSeatMap() {
+      const seatContainer = document.getElementById('seat-map');
+      let seats = '';
+      for (let i = 1; i <= 12; i++) {
+        seats += `<div class="seat" onclick="this.classList.toggle('selected')">S${i}</div>`;
+      }
+      seatContainer.innerHTML = seats;
+    }
 
-function calcComm() {
-  const pkg  = Number(document.getElementById('comm-0')?.value||25000);
-  const pax  = Number(document.getElementById('comm-1')?.value||2);
-  const comm = Number(document.getElementById('comm-2')?.value||10);
-  const total  = pkg * pax;
-  const earned = total * comm / 100;
-  const el = document.getElementById('comm-result');
-  if (!el) return;
-  el.innerHTML = `
-    <div style="background:linear-gradient(135deg,var(--navy),var(--royal));border-radius:14px;padding:24px;color:#fff;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center">
-      <div><div style="font-size:18px;font-weight:900">₹${total.toLocaleString()}</div><div style="font-size:11px;opacity:.75;margin-top:4px">Total Booking</div></div>
-      <div><div style="font-size:18px;font-weight:900">₹${earned.toLocaleString()}</div><div style="font-size:11px;opacity:.75;margin-top:4px">Your Commission</div></div>
-      <div><div style="font-size:18px;font-weight:900">₹${(total-earned).toLocaleString()}</div><div style="font-size:11px;opacity:.75;margin-top:4px">Net Payable</div></div>
-    </div>`;
-}
+    function generateGroupPlan() {
+      const src = document.getElementById('planner-source').value || 'Bengaluru';
+      const dest = document.getElementById('planner-dest').value || 'Tirupati';
+      const vehicle = document.getElementById('planner-vehicle').value;
 
-function generateQuotation() {
-  const name  = document.getElementById('q-name').value || 'Customer';
-  const dest  = document.getElementById('q-dest').value || 'Destination';
-  const date  = document.getElementById('q-date').value;
-  const pax   = document.getElementById('q-pax').value;
-  const price = Number(document.getElementById('q-price').value||15000);
-  const inc   = document.getElementById('q-inc').value || 'Hotel, Transport';
-  const total = price * pax;
-  const today = new Date().toLocaleDateString('en-IN');
-  document.getElementById('quotation-output').innerHTML = `
-    <div class="card" style="padding:28px;border-top:4px solid var(--royal)">
-      <div style="display:flex;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
-        <div><div style="font-size:22px;font-weight:900">🌍 DigiTravel</div><div style="color:var(--muted);font-size:13px">Your Smart Travel Partner</div></div>
-        <div style="text-align:right"><div style="font-weight:800">QUOTATION</div><div style="color:var(--muted);font-size:13px">Date: ${today}</div></div>
-      </div>
-      <div style="border:1.5px solid var(--steel);border-radius:10px;padding:16px;margin-bottom:16px">
-        <div><strong>To:</strong> ${name}</div>
-        <div style="margin-top:4px"><strong>Destination:</strong> ${dest}</div>
-        <div style="margin-top:4px"><strong>Travel Date:</strong> ${date||'TBD'}</div>
-        <div style="margin-top:4px"><strong>Travelers:</strong> ${pax}</div>
-        <div style="margin-top:4px"><strong>Inclusions:</strong> ${inc}</div>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:18px;font-weight:900;padding:12px 0;border-top:2px solid var(--steel)">
-        <span>Total Amount</span>
-        <span style="color:var(--royal)">₹${total.toLocaleString()}</span>
-      </div>
-      <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
-        <button class="btn-wa" style="padding:10px 20px" onclick="waContact('Dear ${name.replace(/'/g,"\\'")} - Your DigiTravel quotation for ${dest}: ₹${total.toLocaleString()} for ${pax} traveler(s). Includes: ${inc}. Valid 7 days. Reply to confirm.')">💬 Send via WhatsApp</button>
-        <button class="btn-outline" style="padding:10px 20px" onclick="window.print()">🖨️ Print Quote</button>
-      </div>
-    </div>`;
-}
+      document.getElementById('planner-output').innerHTML = `
+        <div class="card">
+          <h3>Group Route & Itinerary Plan: ${src} → ${dest}</h3>
+          <p style="font-size:13px; color:var(--slate); margin-bottom:12px">Vehicle Selected: ${vehicle}</p>
+          <div class="day-slot">
+            <div class="day-slot-title">Morning (06:00 AM - 09:00 AM)</div>
+            <div>Start from ${src}. First breakfast stop at highway food court (Approx. 75 km mark).</div>
+          </div>
+          <div class="day-slot">
+            <div class="day-slot-title">Afternoon (01:00 PM - 03:00 PM)</div>
+            <div>Arrival at ${dest}. Check-in, lunch, and prep for temple/attraction timing.</div>
+          </div>
+        </div>
+      `;
+    }
 
-/* ── USER AUTH (Firebase) ── */
-function userLogin() {
-  const email = document.getElementById('u-email').value;
-  const pass  = document.getElementById('u-pass').value;
-  if (!email || !pass) { showToast('⚠️ Enter email and password'); return; }
+    function handleSearch() {
+      const term = document.getElementById('src-dest').value;
+      if (term) alert('Showing curated knowledge guide for: ' + term);
+    }
 
-  if (window._auth && window._fb) {
-    window._fb.signInWithEmailAndPassword(window._auth, email, pass)
-      .then(uc => { showDashboard(uc.user); })
-      .catch(() => showToast('❌ Login failed. Check credentials.'));
-  } else {
-    // Demo mode
-    showDashboard({ email, displayName: email.split('@')[0] });
-  }
-}
+    function quickSearch(name) {
+      document.getElementById('src-dest').value = name;
+      handleSearch();
+    }
 
-function userSignup() {
-  const email = document.getElementById('u-email').value;
-  const pass  = document.getElementById('u-pass').value;
-  if (!email || !pass) { showToast('⚠️ Enter email and password'); return; }
-
-  if (window._auth && window._fb) {
-    window._fb.createUserWithEmailAndPassword(window._auth, email, pass)
-      .then(uc => { showDashboard(uc.user); showToast('✅ Account created!'); })
-      .catch(e => showToast('❌ ' + e.message));
-  } else {
-    showDashboard({ email, displayName: email.split('@')[0] });
-    showToast('✅ Demo account created!');
-  }
-}
-
-function userLogout() {
-  if (window._auth && window._fb) window._fb.signOut(window._auth);
-  document.getElementById('dash-auth-prompt').style.display = 'block';
-  document.getElementById('dash-content').style.display = 'none';
-}
-
-function showDashboard(user) {
-  document.getElementById('dash-auth-prompt').style.display = 'none';
-  document.getElementById('dash-content').style.display = 'block';
-  document.getElementById('dash-user-name').textContent = `Welcome back, ${user.displayName || user.email} 👋`;
-}
-
-function saveItinerary() {
-  if (window._db && window._fb && window._user) {
-    const dest = document.getElementById('it-dest').value;
-    window._fb.addDoc(window._fb.collection(window._db,'itineraries'), {
-      uid: window._user.uid,
-      dest,
-      savedAt: new Date().toISOString()
-    }).then(()=>showToast('✅ Itinerary saved to your account!'))
-      .catch(()=>showToast('❌ Save failed. Check Firebase config.'));
-  } else {
-    showToast('🔐 Login first to save trips');
-    setTimeout(()=>showPage('dashboard'),1000);
-  }
-}
-
-/* ── AUTH STATE ── */
-document.addEventListener('authChanged', e => {
-  if (e.detail) showDashboard(e.detail);
-});
-
-/* ── INIT ── */
-renderHomePkgs();
-</script>
-
+    window.onload = init;
+  </script>
 </body>
 </html>
