@@ -3,15 +3,12 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>DigiTravel – Explore India. Plan Better. Travel Smarter.</title>
-  <meta name="description" content="India's Smart Travel Knowledge & Itinerary Platform. Discover destinations, build itineraries, estimate budgets, and verify transport options."/>
+  <title>DigiTravel – All-in-One Smart Itinerary & Embedded Maps</title>
+  <meta name="description" content="India's Smart Travel Knowledge & Itinerary Platform with inline embedded Google Maps, food stops, fuel & EV charging routes."/>
   <meta name="theme-color" content="#0EA5E9"/>
 
   <link rel="manifest" href="manifest.json"/>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>"/>
-
-  <!-- Chart.js CDN for Budget & Visuals -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 
   <style>
     /* ── RESET & BRAND SYSTEM ── */
@@ -118,29 +115,22 @@
     .card-title { font-size: 18px; margin-bottom: 8px; font-weight: 800; }
     .card-sub { font-size: 13px; color: var(--slate); margin-bottom: 12px; }
 
-    /* ── VERIFICATION COMPARISON MATRIX ── */
-    .verify-badge {
-      display: inline-block; background: rgba(16, 185, 129, 0.15); color: var(--secondary);
-      padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; text-transform: uppercase;
-    }
-
-    /* ── DAY-WISE ITINERARY ── */
+    /* ── MAP & ITINERARY CARDS ── */
     .day-slot {
       border-left: 3px solid var(--primary); padding-left: 14px; margin-bottom: 16px;
     }
     .day-slot-title { font-weight: 800; font-size: 14px; color: var(--primary); }
 
-    /* ── SEAT MAP ALLOCATION ── */
-    .bus-grid {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
-      max-width: 280px; background: var(--bg); padding: 16px; border-radius: 12px; border: 1.5px solid var(--border);
+    .map-btn {
+      display: inline-flex; align-items: center; gap: 6px; background: #4285F4;
+      color: #FFF; padding: 10px 16px; border-radius: 8px; font-weight: 700; font-size: 13px; text-decoration: none; border: none;
     }
-    .seat {
-      background: var(--card-bg); border: 1.5px solid var(--border);
-      height: 40px; border-radius: 6px; display: flex; align-items: center;
-      justify-content: center; font-size: 11px; font-weight: 800; cursor: pointer;
+    .map-btn:hover { background: #3367D6; }
+
+    .map-iframe {
+      width: 100%; height: 380px; border: none; border-radius: 12px; margin-top: 14px;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
     }
-    .seat.selected { background: var(--secondary); color: #FFF; border-color: var(--secondary); }
 
     /* ── BOTTOM NAV ── */
     #bottom-nav {
@@ -169,11 +159,10 @@
         <span class="logo-brand">Digi<span style="color:var(--navy)">Travel</span></span>
       </button>
       <div class="nav-links">
-        <button class="nav-btn active" onclick="showPage('home')">Home</button>
-        <button class="nav-btn" onclick="showPage('explore')">Explore India</button>
-        <button class="nav-btn" onclick="showPage('planner')">Group Planner</button>
-        <button class="nav-btn" onclick="showPage('verify')">Compare & Verify</button>
-        <button class="nav-btn" onclick="showPage('bengaluru')">Bengaluru Trips</button>
+        <button class="nav-btn active" onclick="showPage('home')" data-page="home">Home</button>
+        <button class="nav-btn" onclick="showPage('itinerary')" data-page="itinerary">AI Planner & Embedded Maps</button>
+        <button class="nav-btn" onclick="showPage('explore')" data-page="explore">Explore India</button>
+        <button class="nav-btn" onclick="showPage('bengaluru')" data-page="bengaluru">Bengaluru Trips</button>
         <button class="btn-dark" onclick="toggleDark()">🌙</button>
       </div>
     </div>
@@ -182,18 +171,18 @@
   <!-- PAGE: HOME -->
   <div id="page-home" class="page active">
     <div id="hero">
-      <div class="hero-title">Explore India. <span class="hero-accent">Plan Better.</span> Travel Smarter.</div>
-      <p class="hero-sub">Research destinations, build day-by-day itineraries, estimate budget breakdowns, and verify official transport before booking.</p>
+      <div class="hero-title">Explore Anywhere. <span class="hero-accent">Plan Dynamic Routes.</span></div>
+      <p class="hero-sub">Get instant smart itineraries, commute options, food stops, petrol pumps & EV charging directly on this page.</p>
 
       <div class="search-box">
-        <input class="search-field" id="src-dest" placeholder="State / City / Temple / Beach / Hill Station"/>
+        <input class="search-field" id="src-dest" placeholder="Destination / City / Attraction"/>
         <select class="search-field" id="src-cat">
           <option value="">All Categories</option>
-          <option>Hill Stations</option>
-          <option>Beaches</option>
-          <option>Pilgrimage</option>
-          <option>Weekend Trips</option>
-          <option>Heritage</option>
+          <option value="Hill Station">Hill Stations</option>
+          <option value="Beaches">Beaches</option>
+          <option value="Pilgrimage">Pilgrimage</option>
+          <option value="Weekend Trips">Weekend Trips</option>
+          <option value="Heritage">Heritage</option>
         </select>
         <button class="btn-search" onclick="handleSearch()">Explore Destinations</button>
       </div>
@@ -205,13 +194,12 @@
         <span class="chip" onclick="quickSearch('Valparai')">Valparai</span>
         <span class="chip" onclick="quickSearch('Coorg')">Coorg</span>
         <span class="chip" onclick="quickSearch('Kerala')">Kerala</span>
-        <span class="chip" onclick="quickSearch('Leh')">Leh</span>
         <span class="chip" onclick="quickSearch('Ooty')">Ooty</span>
       </div>
     </div>
 
     <div class="container">
-      <!-- Categories -->
+      <!-- Quick Categories -->
       <div class="section-head">
         <div>
           <h2>Quick Categories</h2>
@@ -220,14 +208,62 @@
       </div>
       <div class="grid-4" id="cat-grid"></div>
 
-      <!-- Special Featured Destinations -->
+      <!-- Featured Destinations -->
       <div class="section-head">
         <div>
           <h2>Featured Destinations</h2>
-          <p style="color:var(--slate); font-size:14px">Complete guides with itineraries, food guides & budget limits</p>
+          <p style="color:var(--slate); font-size:14px">Complete guides with itineraries and commute maps</p>
         </div>
       </div>
       <div class="grid-3" id="featured-dest-grid"></div>
+    </div>
+  </div>
+
+  <!-- PAGE: AI ITINERARY & EMBEDDED MAPS PLANNER -->
+  <div id="page-itinerary" class="page">
+    <div class="container" style="padding-top:24px">
+      <div class="section-head">
+        <div>
+          <h2>AI Dynamic Itinerary & Highway Utility Explorer</h2>
+          <p style="color:var(--slate); font-size:14px">Enter your start location and destination to see full itineraries, food stops, petrol pumps, and EV chargers embedded right here.</p>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom: 24px;">
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:14px;">
+          <div>
+            <label style="font-size:12px; font-weight:700; color:var(--slate); display:block; margin-bottom:4px">YOUR STARTING LOCATION</label>
+            <input class="search-field" id="user-origin" placeholder="e.g., Bengaluru, Mysore, or Kannur"/>
+          </div>
+          <div>
+            <label style="font-size:12px; font-weight:700; color:var(--slate); display:block; margin-bottom:4px">DESTINATION</label>
+            <input class="search-field" id="user-destination" placeholder="e.g., Tirupati, Coorg, Ooty"/>
+          </div>
+          <div>
+            <label style="font-size:12px; font-weight:700; color:var(--slate); display:block; margin-bottom:4px">TRIP DURATION</label>
+            <select class="search-field" id="trip-days">
+              <option value="1">1 Day Express Trip</option>
+              <option value="2">2 Days Weekend Getaway</option>
+              <option value="3">3 Days Detailed Exploration</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:12px; font-weight:700; color:var(--slate); display:block; margin-bottom:4px">VEHICLE / TRAVEL MODE</label>
+            <select class="search-field" id="travel-mode">
+              <option value="driving">Car / Bike (Petrol / Diesel)</option>
+              <option value="ev">Electric Vehicle (EV)</option>
+              <option value="transit">Public Bus / Train</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn-search" style="grid-column:auto; flex:1" onclick="generateAIItinerary()">⚡ Generate Itinerary & Embedded Maps</button>
+          <button class="map-btn" style="background:var(--navy)" onclick="useCurrentLocationAsOrigin()">📍 Auto-Detect Location</button>
+        </div>
+      </div>
+
+      <!-- Output Section -->
+      <div id="itinerary-output"></div>
     </div>
   </div>
 
@@ -244,78 +280,7 @@
     </div>
   </div>
 
-  <!-- PAGE: GROUP TRIP PLANNER -->
-  <div id="page-planner" class="page">
-    <div class="container" style="padding-top:24px">
-      <div class="section-head">
-        <div>
-          <h2>AI Group Trip Planner & Expense Tracker</h2>
-          <p style="color:var(--slate); font-size:14px">Organize route, seating allocation, and shared expenses</p>
-        </div>
-      </div>
-
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px">
-        <div class="card">
-          <h3 class="card-title">Trip Setup</h3>
-          <div style="display:grid; gap:12px; margin-top:14px">
-            <input class="search-field" id="planner-source" placeholder="Source City (e.g., Bengaluru)"/>
-            <input class="search-field" id="planner-dest" placeholder="Destination (e.g., Tirupati)"/>
-            <select class="search-field" id="planner-vehicle">
-              <option>Innova (6-7 Seats)</option>
-              <option>Tempo Traveller (12-16 Seats)</option>
-              <option>Mini Bus (21 Seats)</option>
-            </select>
-            <button class="btn-search" style="grid-column:auto" onclick="generateGroupPlan()">Generate Route & Itinerary Plan</button>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3 class="card-title">Vehicle Seat Allocation</h3>
-          <p class="card-sub">Visual layout for passenger seating</p>
-          <div class="bus-grid" id="seat-map"></div>
-        </div>
-      </div>
-
-      <div id="planner-output" style="margin-top:20px"></div>
-    </div>
-  </div>
-
-  <!-- PAGE: COMPARE & VERIFY BEFORE BOOKING -->
-  <div id="page-verify" class="page">
-    <div class="container" style="padding-top:24px">
-      <div class="section-head">
-        <div>
-          <h2>Where to Verify Before Booking</h2>
-          <p style="color:var(--slate); font-size:14px">DigiTravel provides itinerary guidance. Verify live rates and schedules on official platforms.</p>
-        </div>
-      </div>
-
-      <div class="grid-3">
-        <div class="card">
-          <span class="verify-badge">Official Railway Verification</span>
-          <h3 style="margin:10px 0 6px">Trains & Tatkal</h3>
-          <p style="font-size:13px; color:var(--slate); margin-bottom:14px">Verify official seat availability, RAC, waiting list, and Tatkal fares directly on IRCTC before reserving.</p>
-          <a href="https://www.irctc.co.in" target="_blank" class="badge-tag" style="display:inline-block; padding:8px 12px">Open IRCTC Official Site →</a>
-        </div>
-
-        <div class="card">
-          <span class="verify-badge">Flight Comparison</span>
-          <h3 style="margin:10px 0 6px">Air Travelers</h3>
-          <p style="font-size:13px; color:var(--slate); margin-bottom:14px">Compare direct airline prices vs aggregators (Via.com, MakeMyTrip, EaseMyTrip) to avoid hidden convenience fees.</p>
-          <a href="https://www.via.com" target="_blank" class="badge-tag" style="display:inline-block; padding:8px 12px">Verify via Via.com →</a>
-        </div>
-
-        <div class="card">
-          <span class="verify-badge">Bus Transport</span>
-          <h3 style="margin:10px 0 6px">State & Private Buses</h3>
-          <p style="font-size:13px; color:var(--slate); margin-bottom:14px">Cross-check official State Road Transport Corporation (SRTC) portals with RedBus and AbhiBus schedules.</p>
-          <a href="https://www.redbus.in" target="_blank" class="badge-tag" style="display:inline-block; padding:8px 12px">Verify Bus Routes →</a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PAGE: BENGALURU DAY TRIPS & PILGRIMAGE CIRCUITS -->
+  <!-- PAGE: BENGALURU DAY TRIPS -->
   <div id="page-bengaluru" class="page">
     <div class="container" style="padding-top:24px">
       <div class="section-head">
@@ -331,15 +296,13 @@
   <!-- BOTTOM NAV -->
   <div id="bottom-nav">
     <button class="bnav-btn active" onclick="showPage('home')" data-page="home"><span>🏠</span>Home</button>
-    <button class="bnav-btn" onclick="showPage('explore')" data-page="explore"><span>🗺️</span>Explore</button>
-    <button class="bnav-btn" onclick="showPage('planner')" data-page="planner"><span>🚌</span>Group Plan</button>
-    <button class="bnav-btn" onclick="showPage('verify')" data-page="verify"><span>✅</span>Verify</button>
+    <button class="bnav-btn" onclick="showPage('itinerary')" data-page="itinerary"><span>🗺️</span>AI Planner</button>
+    <button class="bnav-btn" onclick="showPage('explore')" data-page="explore"><span>📍</span>Explore</button>
     <button class="bnav-btn" onclick="showPage('bengaluru')" data-page="bengaluru"><span>🚗</span>BLR Trips</button>
   </div>
 
   <!-- JAVASCRIPT LOGIC -->
   <script>
-    /* ── DATA STORES (Mocking JSON structures) ── */
     const CATEGORIES = [
       { title: "Hill Stations", icon: "⛰️", count: "42 Destinations" },
       { title: "Beaches", icon: "🏖️", count: "28 Locations" },
@@ -354,9 +317,9 @@
     const FEATURED_DESTINATIONS = [
       { name: "Valparai", state: "Tamil Nadu", type: "Hill Station", desc: "Tea estates, hairpin bends, and quiet wildlife spots.", bestTime: "Oct - Mar" },
       { name: "Gaya & Bodh Gaya", state: "Bihar", type: "Pilgrimage", desc: "Mahabodhi Temple, spiritual tranquility, and ritual guides.", bestTime: "Nov - Feb" },
-      { name: "Coorg", state: "Karnataka", type: "Nature & Coffee", desc: "Misty hills, waterfalls, and Kodava culinary routes.", bestTime: "Oct - Jun" },
-      { name: "Varanasi", state: "Uttar Pradesh", type: "Spiritual Heritage", desc: "Ganga Aarti timing, ghat walks, and temple etiquette.", bestTime: "Oct - Mar" },
-      { name: "Goa", state: "Goa", type: "Beaches & Heritage", desc: "Beyond beaches: Old Goa churches, waterfalls, and spice farms.", bestTime: "Nov - Feb" },
+      { name: "Coorg", state: "Karnataka", type: "Hill Station", desc: "Misty hills, waterfalls, and Kodava culinary routes.", bestTime: "Oct - Jun" },
+      { name: "Varanasi", state: "Uttar Pradesh", type: "Pilgrimage", desc: "Ganga Aarti timing, ghat walks, and temple etiquette.", bestTime: "Oct - Mar" },
+      { name: "Goa", state: "Goa", type: "Beaches", desc: "Beyond beaches: Old Goa churches, waterfalls, and spice farms.", bestTime: "Nov - Feb" },
       { name: "Munnar", state: "Kerala", type: "Hill Station", desc: "Anamudi peak views, tea museum, and green valleys.", bestTime: "Sep - Mar" }
     ];
 
@@ -376,13 +339,11 @@
       { name: "Bengaluru → Dharmasthala & Kukke", range: "Within 300 km", time: "6.5 Hours", highlight: "Western Ghats drive, Pilgrimage" }
     ];
 
-    /* ── APPLICATION LOGIC ── */
     function init() {
       renderCategories();
-      renderFeatured();
+      renderFeatured(FEATURED_DESTINATIONS);
       renderStates();
       renderBLR();
-      renderSeatMap();
     }
 
     function showPage(id) {
@@ -400,7 +361,7 @@
 
     function renderCategories() {
       document.getElementById('cat-grid').innerHTML = CATEGORIES.map(c => `
-        <div class="card" style="cursor:pointer" onclick="quickSearch('${c.title}')">
+        <div class="card" style="cursor:pointer" onclick="filterByCategory('${c.title}')">
           <div style="font-size:32px; margin-bottom:8px">${c.icon}</div>
           <div class="card-title">${c.title}</div>
           <div class="card-sub">${c.count}</div>
@@ -408,16 +369,51 @@
       `).join('');
     }
 
-    function renderFeatured() {
-      document.getElementById('featured-dest-grid').innerHTML = FEATURED_DESTINATIONS.map(d => `
+    function renderFeatured(list) {
+      const grid = document.getElementById('featured-dest-grid');
+      if (list.length === 0) {
+        grid.innerHTML = `<div style="grid-column: 1/-1; padding: 24px; text-align: center; color: var(--slate);">No matching destinations found.</div>`;
+        return;
+      }
+
+      grid.innerHTML = list.map(d => `
         <div class="card">
           <span class="badge-tag">${d.type}</span>
           <h3 style="margin:10px 0 4px">${d.name}</h3>
           <div style="font-size:12px; color:var(--slate); margin-bottom:8px">${d.state} &bull; Best: ${d.bestTime}</div>
           <p style="font-size:13px; color:var(--slate); margin-bottom:14px">${d.desc}</p>
-          <button class="badge-tag" style="background:var(--primary); color:#FFF; border:none; padding:8px 12px; cursor:pointer">Explore Knowledge Guide →</button>
+          <button class="map-btn" style="padding:8px 12px; font-size:12px;" onclick="loadDestinationPlanner('${d.name}')">🗺️ Plan Trip Here</button>
         </div>
       `).join('');
+    }
+
+    function filterByCategory(categoryName) {
+      document.getElementById('src-dest').value = categoryName;
+      handleSearch();
+    }
+
+    function handleSearch() {
+      const term = document.getElementById('src-dest').value.toLowerCase().trim();
+      const catSelect = document.getElementById('src-cat').value.toLowerCase().trim();
+
+      const filtered = FEATURED_DESTINATIONS.filter(d => {
+        const matchesTerm = !term || 
+          d.name.toLowerCase().includes(term) || 
+          d.state.toLowerCase().includes(term) || 
+          d.type.toLowerCase().includes(term);
+
+        const matchesCat = !catSelect || d.type.toLowerCase().includes(catSelect);
+
+        return matchesTerm && matchesCat;
+      });
+
+      renderFeatured(filtered);
+      document.getElementById('featured-dest-grid').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function quickSearch(name) {
+      document.getElementById('src-dest').value = name;
+      handleSearch();
     }
 
     function renderStates() {
@@ -426,7 +422,8 @@
           <h3 class="card-title">${s.name}</h3>
           <div style="font-size:12px; color:var(--slate); margin-bottom:6px">Capital: <strong>${s.capital}</strong></div>
           <div style="font-size:12px; color:var(--slate); margin-bottom:10px">Best Time: ${s.best}</div>
-          <p style="font-size:12px; color:var(--slate)">Places: ${s.popular}</p>
+          <p style="font-size:12px; color:var(--slate); margin-bottom:12px">Popular: ${s.popular}</p>
+          <button class="map-btn" style="padding:6px 10px; font-size:11px;" onclick="loadDestinationPlanner('${s.name}')">🗺️ Explore Route</button>
         </div>
       `).join('');
     }
@@ -437,49 +434,118 @@
           <span class="badge-tag">${t.range}</span>
           <h3 style="margin:10px 0 4px">${t.name}</h3>
           <div style="font-size:12px; color:var(--slate); margin-bottom:8px">Drive Time: ${t.time}</div>
-          <p style="font-size:13px; color:var(--slate)">Highlights: ${t.highlight}</p>
+          <p style="font-size:13px; color:var(--slate); margin-bottom:14px">Highlights: ${t.highlight}</p>
+          <button class="map-btn" style="padding:6px 12px; font-size:12px;" onclick="loadDestinationPlanner('${t.name.split('→')[1].trim()}')">🚗 Plan Route</button>
         </div>
       `).join('');
     }
 
-    function renderSeatMap() {
-      const seatContainer = document.getElementById('seat-map');
-      let seats = '';
-      for (let i = 1; i <= 12; i++) {
-        seats += `<div class="seat" onclick="this.classList.toggle('selected')">S${i}</div>`;
+    function loadDestinationPlanner(destName) {
+      showPage('itinerary');
+      document.getElementById('user-destination').value = destName;
+      generateAIItinerary();
+    }
+
+    /* ── SAFE GPS GEOLOCATION WITH PROMPT FALLBACK ── */
+    function useCurrentLocationAsOrigin() {
+      const originInput = document.getElementById('user-origin');
+      
+      if (navigator.geolocation && location.protocol !== 'file:') {
+        originInput.value = "Detecting GPS location...";
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            originInput.value = `${position.coords.latitude.toFixed(4)}, ${position.coords.longitude.toFixed(4)}`;
+          },
+          (err) => {
+            let city = prompt("GPS access is blocked by browser. Please enter your current city/location name:", "Bengaluru");
+            if (city) originInput.value = city;
+          }
+        );
+      } else {
+        let city = prompt("Please enter your current city or location:", "Bengaluru");
+        if (city) originInput.value = city;
       }
-      seatContainer.innerHTML = seats;
     }
 
-    function generateGroupPlan() {
-      const src = document.getElementById('planner-source').value || 'Bengaluru';
-      const dest = document.getElementById('planner-dest').value || 'Tirupati';
-      const vehicle = document.getElementById('planner-vehicle').value;
+    /* ── EMBEDDED MAP GENERATOR (STAYS ON THE PAGE) ── */
+    function switchEmbeddedMap(queryType) {
+      const origin = document.getElementById('user-origin').value.trim() || 'Bengaluru';
+      const dest = document.getElementById('user-destination').value.trim() || 'Tirupati';
+      const iframe = document.getElementById('inline-map-frame');
 
-      document.getElementById('planner-output').innerHTML = `
-        <div class="card">
-          <h3>Group Route & Itinerary Plan: ${src} → ${dest}</h3>
-          <p style="font-size:13px; color:var(--slate); margin-bottom:12px">Vehicle Selected: ${vehicle}</p>
-          <div class="day-slot">
-            <div class="day-slot-title">Morning (06:00 AM - 09:00 AM)</div>
-            <div>Start from ${src}. First breakfast stop at highway food court (Approx. 75 km mark).</div>
+      let searchQuery = '';
+      if (queryType === 'route') {
+        searchQuery = `${origin} to ${dest}`;
+      } else if (queryType === 'food') {
+        searchQuery = `top rated restaurants food stops between ${origin} and ${dest}`;
+      } else if (queryType === 'fuel') {
+        searchQuery = `petrol diesel pumps on highway between ${origin} and ${dest}`;
+      } else if (queryType === 'ev') {
+        searchQuery = `EV charging stations between ${origin} and ${dest}`;
+      }
+
+      iframe.src = `https://maps.google.com/maps?q=${encodeURIComponent(searchQuery)}&t=&z=10&ie=UTF8&iwloc=&output=embed`;
+    }
+
+    /* ── AI DYNAMIC ITINERARY GENERATOR ── */
+    function generateAIItinerary() {
+      const origin = document.getElementById('user-origin').value.trim() || 'Bengaluru';
+      const dest = document.getElementById('user-destination').value.trim();
+      const days = parseInt(document.getElementById('trip-days').value, 10);
+      const mode = document.getElementById('travel-mode').value;
+      const outputEl = document.getElementById('itinerary-output');
+
+      if (!dest) {
+        outputEl.innerHTML = `<div class="card" style="color:#e11d48; font-weight:700">Please enter a destination to generate your itinerary.</div>`;
+        return;
+      }
+
+      let dayHtml = '';
+      for (let i = 1; i <= days; i++) {
+        dayHtml += `
+          <div class="card" style="margin-bottom:16px;">
+            <h3 style="color:var(--primary); margin-bottom:12px;">📅 Day ${i}: ${dest} Sightseeing & Pitstops</h3>
+            
+            <div class="day-slot">
+              <div class="day-slot-title">Morning (06:30 AM - 11:30 AM)</div>
+              <div>Departure from <strong>${i === 1 ? origin : 'Hotel'}</strong>. First recommended breakfast & coffee stop at highway food Plaza (Approx 60-80km mark).</div>
+            </div>
+
+            <div class="day-slot">
+              <div class="day-slot-title">Afternoon (12:30 PM - 04:30 PM)</div>
+              <div>Lunch break at local specialty restaurant. Visit primary sightseeing spots, temples, or nature trails around ${dest}.</div>
+            </div>
+
+            <div class="day-slot">
+              <div class="day-slot-title">Evening & Night (05:30 PM - 09:00 PM)</div>
+              <div>Sunset viewpoints, handicraft market walks, and authentic regional dinner before night stay.</div>
+            </div>
           </div>
-          <div class="day-slot">
-            <div class="day-slot-title">Afternoon (01:00 PM - 03:00 PM)</div>
-            <div>Arrival at ${dest}. Check-in, lunch, and prep for temple/attraction timing.</div>
+        `;
+      }
+
+      const initialMapQuery = `${origin} to ${dest}`;
+
+      outputEl.innerHTML = `
+        <div class="card" style="margin-bottom:20px; border-left:4px solid var(--secondary);">
+          <h2>Route Overview & Embedded Map</h2>
+          <p style="color:var(--slate); margin-bottom:14px">Journey from <strong>${origin}</strong> to <strong>${dest}</strong> (${mode.toUpperCase()})</p>
+
+          <!-- Interactive Embedded Map Category Buttons (Does NOT open Google Maps in new window) -->
+          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;">
+            <button class="map-btn" style="background:var(--primary)" onclick="switchEmbeddedMap('route')">🗺️ Full Driving Route</button>
+            <button class="map-btn" style="background:#10B981" onclick="switchEmbeddedMap('food')">🍽️ Best Food & Restaurants</button>
+            <button class="map-btn" style="background:#F59E0B" onclick="switchEmbeddedMap('fuel')">⛽ Petrol / Diesel Pumps</button>
+            <button class="map-btn" style="background:#8B5CF6" onclick="switchEmbeddedMap('ev')">⚡ EV Charging Stations</button>
           </div>
+
+          <!-- Embedded Map Frame -->
+          <iframe id="inline-map-frame" class="map-iframe" src="https://maps.google.com/maps?q=${encodeURIComponent(initialMapQuery)}&t=&z=10&ie=UTF8&iwloc=&output=embed"></iframe>
         </div>
+        ${dayHtml}
       `;
-    }
 
-    function handleSearch() {
-      const term = document.getElementById('src-dest').value;
-      if (term) alert('Showing curated knowledge guide for: ' + term);
-    }
-
-    function quickSearch(name) {
-      document.getElementById('src-dest').value = name;
-      handleSearch();
+      outputEl.scrollIntoView({ behavior: 'smooth' });
     }
 
     window.onload = init;
