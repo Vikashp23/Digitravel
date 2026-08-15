@@ -41,6 +41,7 @@
   --shadow-lg: 0 12px 40px rgba(15,52,96,.15);
   --font-d:    'Playfair Display', Georgia, serif;
   --font-b:    'Inter', system-ui, sans-serif;
+  --jadeLt:    #D1FAE5;
 }
 body.dark {
   --cream: #0A1628; --ice: #0F1E35; --white: #0D2137;
@@ -70,8 +71,12 @@ img { max-width:100%; display:block; }
 /* ── TOP NAV ── */
 #topnav {
   position:sticky; top:0; z-index:300;
-  background:var(--navy); color:#fff;
-  box-shadow:0 2px 20px rgba(0,0,0,.28);
+  background:rgba(15,52,96,.97);
+  backdrop-filter:blur(18px) saturate(180%);
+  -webkit-backdrop-filter:blur(18px) saturate(180%);
+  color:#fff;
+  box-shadow:0 2px 24px rgba(0,0,0,.32);
+  border-bottom:1px solid rgba(255,255,255,.07);
 }
 .nav-inner { display:flex; align-items:center; justify-content:space-between; height:60px; padding:0 22px; max-width:1180px; margin:0 auto; }
 .logo-btn { background:none; border:none; color:#fff; display:flex; align-items:center; gap:10px; font-family:var(--font-d); font-size:21px; font-weight:900; }
@@ -127,14 +132,53 @@ body.dark .card { background:#0D2137; border-color:#1A3A5C; }
 .pill:hover { border-color:var(--saffron); color:var(--saffron); }
 body.dark .pill { background:#0a1628; border-color:#1A3A5C; }
 
-/* ── HERO ── */
-#hero { background:linear-gradient(150deg,var(--navy2) 0%,var(--navy) 45%,#1a4a7a 100%); position:relative; overflow:hidden; padding:60px 24px 56px; }
-#hero::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 5% 70%,rgba(249,115,22,.2) 0%,transparent 55%),radial-gradient(ellipse at 95% 10%,rgba(13,115,119,.22) 0%,transparent 55%); pointer-events:none; }
-.hero-inner { position:relative; max-width:860px; margin:0 auto; text-align:center; color:#fff; }
-.hero-eyebrow { display:inline-block; background:rgba(249,168,37,.18); border:1px solid rgba(249,168,37,.35); color:#FCD34D; border-radius:99px; padding:5px 18px; font-size:11px; font-weight:800; letter-spacing:2px; text-transform:uppercase; margin-bottom:20px; }
-.hero-title { font-family:var(--font-d); font-size:clamp(30px,6vw,64px); font-weight:900; margin-bottom:14px; letter-spacing:-1px; line-height:1.1; }
-.hero-title .hl { background:linear-gradient(90deg,#FBBF24,#F97316); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-.hero-sub { font-size:clamp(14px,2vw,18px); opacity:.8; margin-bottom:36px; max-width:520px; margin-inline:auto; line-height:1.65; }
+/* ── HERO — ViaWorld inspired: bold gradient + floating search card ── */
+#hero {
+  position:relative; overflow:hidden;
+  background:linear-gradient(135deg,#0a1628 0%,#0F3460 45%,#0d4f7c 100%);
+  padding:64px 24px 80px;
+}
+#hero::before {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:
+    radial-gradient(ellipse at 8% 80%,rgba(249,115,22,.25) 0%,transparent 50%),
+    radial-gradient(ellipse at 92% 15%,rgba(13,115,119,.18) 0%,transparent 50%),
+    url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.025'%3E%3Ccircle cx='40' cy='40' r='1'/%3E%3C/g%3E%3C/svg%3E");
+}
+.hero-inner { position:relative; max-width:900px; margin:0 auto; text-align:center; color:#fff; }
+.hero-eyebrow { display:inline-flex; align-items:center; gap:8px; background:rgba(249,168,37,.15); border:1px solid rgba(249,168,37,.3); color:#FCD34D; border-radius:99px; padding:6px 18px; font-size:11px; font-weight:800; letter-spacing:2px; text-transform:uppercase; margin-bottom:24px; }
+.hero-title { font-family:var(--font-d); font-size:clamp(32px,6vw,68px); font-weight:900; margin-bottom:16px; letter-spacing:-1.5px; line-height:1.06; }
+.hero-title .hl { background:linear-gradient(90deg,#FBBF24,#F97316,#ef4444); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.hero-sub { font-size:clamp(14px,2vw,18px); opacity:.78; margin-bottom:44px; max-width:560px; margin-inline:auto; line-height:1.7; }
+
+/* ViaWorld-style floating search card */
+.hero-search-card {
+  background:rgba(255,255,255,.97);
+  border-radius:20px;
+  padding:28px 32px 24px;
+  max-width:780px;
+  margin:0 auto 32px;
+  box-shadow:0 24px 80px rgba(0,0,0,.35);
+  text-align:left;
+}
+body.dark .hero-search-card { background:rgba(13,33,55,.97); }
+.hsc-tabs { display:flex; gap:0; margin-bottom:20px; border-bottom:2px solid var(--steel); }
+.hsc-tab { background:none; border:none; padding:10px 18px; font-size:13px; font-weight:700; color:var(--muted); cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; font-family:var(--font-b); transition:all .15s; }
+.hsc-tab.act { color:var(--saffron); border-bottom-color:var(--saffron); }
+.hsc-fields { display:grid; grid-template-columns:1fr 1fr auto; gap:10px; align-items:end; }
+@media(max-width:600px){ .hsc-fields { grid-template-columns:1fr; } }
+.hsc-field { position:relative; }
+.hsc-label { font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--slate); margin-bottom:5px; display:flex; align-items:center; gap:5px; }
+.hsc-input { width:100%; border:1.5px solid var(--steel); border-radius:10px; padding:11px 14px 11px 38px; font-size:15px; font-weight:600; color:var(--ink); background:var(--ice); font-family:var(--font-b); }
+body.dark .hsc-input { background:#0a1628; color:#E2E8F0; border-color:#1A3A5C; }
+.hsc-input:focus { border-color:var(--saffron); box-shadow:0 0 0 3px rgba(249,115,22,.12); }
+.hsc-icon { position:absolute; left:12px; bottom:12px; font-size:16px; pointer-events:none; }
+.hsc-btn { background:linear-gradient(135deg,var(--saffron),var(--saffron2)); color:#fff; border:none; border-radius:12px; padding:13px 28px; font-weight:900; font-size:15px; white-space:nowrap; box-shadow:0 6px 20px rgba(249,115,22,.4); font-family:var(--font-b); cursor:pointer; width:100%; }
+.hsc-btn:hover { opacity:.9; transform:translateY(-1px); }
+
+.hero-pills { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+.hero-pill { background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); border-radius:99px; padding:6px 16px; font-size:12px; font-weight:600; cursor:pointer; color:#fff; transition:all .15s; }
+.hero-pill:hover { background:rgba(255,255,255,.22); }
 .hero-search-wrap { background:rgba(255,255,255,.96); border-radius:18px; padding:8px 8px 8px 20px; display:flex; gap:8px; align-items:center; max-width:640px; margin:0 auto 28px; box-shadow:0 20px 60px rgba(0,0,0,.28); }
 .hero-search-wrap input { flex:1; border:none; background:none; font-size:16px; color:var(--ink); font-weight:500; }
 .hero-search-wrap input::placeholder { color:var(--muted); }
@@ -278,8 +322,14 @@ footer { background:var(--navy2); color:rgba(255,255,255,.72); padding:44px 24px
 .mt8 { margin-top:8px; } .mt16 { margin-top:16px; } .mt24 { margin-top:24px; } .mt32 { margin-top:32px; }
 .mb8 { margin-bottom:8px; } .mb16 { margin-bottom:16px; } .mb24 { margin-bottom:24px; }
 .txt-saffron { color:var(--saffron); } .txt-jade { color:var(--jade); } .txt-rose { color:var(--rose); }
-.spinner { width:46px; height:46px; border:4px solid var(--steel); border-top-color:var(--saffron); border-radius:50%; animation:spin .8s linear infinite; margin:0 auto; }
+.spinner { width:56px; height:56px; border:5px solid var(--steel); border-top-color:var(--saffron); border-radius:50%; animation:spin .7s linear infinite; margin:0 auto; }
 @keyframes spin { to{transform:rotate(360deg)} }
+.ai-loading-card { background:var(--white); border:1.5px solid var(--steel); border-radius:20px; padding:48px 32px; text-align:center; max-width:480px; margin:40px auto; box-shadow:var(--shadow-lg); }
+.ai-loading-steps { display:flex; flex-direction:column; gap:10px; margin-top:24px; text-align:left; }
+.ai-step { display:flex; align-items:center; gap:12px; padding:10px 14px; border-radius:10px; font-size:13px; font-weight:600; transition:all .4s; }
+.ai-step.done { background:var(--jadeLt,#D1FAE5); color:var(--jade); }
+.ai-step.active { background:rgba(249,115,22,.1); color:var(--saffron2); }
+.ai-step.idle { background:var(--ice); color:var(--muted); }
 </style>
 </head>
 <body>
@@ -300,6 +350,7 @@ footer { background:var(--navy2); color:rgba(255,255,255,.72); padding:44px 24px
       <button class="nav-btn" onclick="nav('budget')">Budget</button>
       <button class="nav-btn" onclick="nav('pilgrimage')">Pilgrimage</button>
       <button class="nav-btn" onclick="nav('tips')">Travel Tips</button>
+      <button class="nav-btn" onclick="nav('compare')">🔗 Compare</button>
       <button class="btn-dark" onclick="toggleDark()" id="dkBtn">🌙</button>
       <button class="nav-btn-cta" onclick="openSearch()">🔍 Search</button>
     </div>
@@ -317,6 +368,7 @@ footer { background:var(--navy2); color:rgba(255,255,255,.72); padding:44px 24px
     <button onclick="nav('hidden');closeMob()">💎 Hidden Gems</button>
     <button onclick="nav('festivals');closeMob()">🎉 Festivals</button>
     <button onclick="nav('tips');closeMob()">💡 Travel Tips</button>
+    <button onclick="nav('compare');closeMob()">🔗 Compare Booking</button>
     <button onclick="openSearch();closeMob()">🔍 Search India</button>
     <button onclick="toggleDark();closeMob()">🌙 Dark/Light Mode</button>
   </div>
@@ -338,27 +390,60 @@ footer { background:var(--navy2); color:rgba(255,255,255,.72); padding:44px 24px
 ════════════════════════════════════ -->
 <div id="page-home" class="page active">
 
-  <!-- Hero -->
+  <!-- Hero — ViaWorld style -->
   <div id="hero">
     <div class="hero-inner">
-      <div class="hero-eyebrow">✦ India's Complete Travel Planning Platform</div>
+      <div class="hero-eyebrow">✦ India's #1 Travel Knowledge & Planning Hub</div>
       <h1 class="hero-title">
-        Explore India.<br/>
-        <span class="hl">Plan Better. Travel Smarter.</span>
+        Explore India<br/>
+        <span class="hl">Like Never Before</span>
       </h1>
-      <p class="hero-sub">Discover all 36 States & UTs. Build detailed itineraries. Plan group trips. Budget your journey — all in one trusted place.</p>
-      <div class="hero-search-wrap">
-        <span style="font-size:20px">🔍</span>
-        <input id="h-search" placeholder="Search any place in India…  e.g. Goa, Gaya, Valparai, Coorg, Leh…" onfocus="openSearch()"/>
-        <button class="hero-search-btn" onclick="openSearch()">Search India</button>
+      <p class="hero-sub">Plan smarter with AI itineraries, pilgrimage guides, hidden gems, group trip planner and trusted booking comparisons — all free.</p>
+
+      <!-- ViaWorld-style floating search card -->
+      <div class="hero-search-card">
+        <div class="hsc-tabs">
+          <button class="hsc-tab act" onclick="switchHeroTab('planner',this)">🗺️ Trip Planner</button>
+          <button class="hsc-tab" onclick="switchHeroTab('search',this)">🔍 Search Destination</button>
+          <button class="hsc-tab" onclick="nav('group')">👥 Group Trip</button>
+          <button class="hsc-tab" onclick="nav('pilgrimage')">🛕 Pilgrimage</button>
+        </div>
+        <div id="hsc-content">
+          <!-- Trip Planner tab -->
+          <div id="hsc-planner">
+            <div class="hsc-fields">
+              <div class="hsc-field">
+                <div class="hsc-label">📍 From</div>
+                <span class="hsc-icon">🏠</span>
+                <input class="hsc-input" id="hsc-from" placeholder="Bengaluru" value="Bengaluru"/>
+              </div>
+              <div class="hsc-field">
+                <div class="hsc-label">🎯 Destination</div>
+                <span class="hsc-icon">📌</span>
+                <input class="hsc-input" id="hsc-dest" placeholder="e.g. Coorg, Goa, Tirupati, Nandi Hills…"/>
+              </div>
+              <button class="hsc-btn" onclick="launchPlanner()">Plan My Trip →</button>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+              <span style="font-size:11px;color:var(--slate);font-weight:600;align-self:center">Popular:</span>
+              <span class="pill" style="font-size:11px;padding:4px 12px;cursor:pointer" onclick="quickPlan('Coorg')">☕ Coorg</span>
+              <span class="pill" style="font-size:11px;padding:4px 12px;cursor:pointer" onclick="quickPlan('Goa')">🏖️ Goa</span>
+              <span class="pill" style="font-size:11px;padding:4px 12px;cursor:pointer" onclick="quickPlan('Tirupati')">🛕 Tirupati</span>
+              <span class="pill" style="font-size:11px;padding:4px 12px;cursor:pointer" onclick="quickPlan('Nandi Hills')">⛰️ Nandi Hills</span>
+              <span class="pill" style="font-size:11px;padding:4px 12px;cursor:pointer" onclick="quickPlan('Leh Ladakh')">🏔️ Leh-Ladakh</span>
+              <span class="pill" style="font-size:11px;padding:4px 12px;cursor:pointer" onclick="quickPlan('Munnar')">🌿 Munnar</span>
+            </div>
+          </div>
+        </div>
       </div>
+
       <div class="hero-pills">
         <span class="hero-pill" onclick="nav('states')">🗺️ 36 States & UTs</span>
         <span class="hero-pill" onclick="filterDest('pilgrimage')">🛕 Pilgrimage</span>
         <span class="hero-pill" onclick="filterDest('hill')">🏔️ Hill Stations</span>
         <span class="hero-pill" onclick="nav('hidden')">💎 Hidden Gems</span>
         <span class="hero-pill" onclick="nav('templates')">📋 Trip Templates</span>
-        <span class="hero-pill" onclick="nav('group')">👥 Group Planner</span>
+        <span class="hero-pill" onclick="nav('compare')">🔗 Compare Booking</span>
       </div>
     </div>
   </div>
@@ -552,10 +637,17 @@ footer { background:var(--navy2); color:rgba(255,255,255,.72); padding:44px 24px
 
 <!-- ════════════ PAGE: GROUP PLANNER ════════════ -->
 <div id="page-group" class="page">
-  <div style="background:linear-gradient(135deg,var(--navy2),#1a3c0a);padding:44px 24px;color:#fff;text-align:center">
-    <div class="sec-eyebrow" style="color:#86EFAC">AI-Powered</div>
-    <h1 style="font-family:var(--font-d);font-size:clamp(26px,4vw,44px);font-weight:900;margin-bottom:10px">👥 AI Group Trip Planner</h1>
-    <p style="opacity:.75;font-size:15px;max-width:520px;margin:0 auto">Plan family trips, temple tours, corporate outings and weekend getaways — with full expense tracking.</p>
+  <div style="background:linear-gradient(135deg,var(--navy2),#1a3c0a);padding:48px 24px;color:#fff;text-align:center">
+    <div style="font-size:11px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:#86EFAC;margin-bottom:10px">AI-Powered by Claude</div>
+    <h1 style="font-family:var(--font-d);font-size:clamp(26px,4vw,48px);font-weight:900;margin-bottom:10px">👥 AI Group Trip Planner</h1>
+    <p style="opacity:.75;font-size:15px;max-width:560px;margin:0 auto 20px">Enter any destination — pilgrimage, bike ride, nature trip, family outing. AI generates a full itinerary with Google Maps links and expense tracker.</p>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <span style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:99px;padding:5px 14px;font-size:12px;font-weight:600">🛕 Pilgrimage</span>
+      <span style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:99px;padding:5px 14px;font-size:12px;font-weight:600">🏍️ Bike Ride</span>
+      <span style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:99px;padding:5px 14px;font-size:12px;font-weight:600">👨‍👩‍👧 Family Trip</span>
+      <span style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:99px;padding:5px 14px;font-size:12px;font-weight:600">💼 Corporate</span>
+      <span style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:99px;padding:5px 14px;font-size:12px;font-weight:600">🌿 Nature</span>
+    </div>
   </div>
   <div class="wrap" style="padding:32px 22px" id="group-content"></div>
 </div>
@@ -624,6 +716,16 @@ footer { background:var(--navy2); color:rgba(255,255,255,.72); padding:44px 24px
   <div class="wrap" style="padding:36px 22px">
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px" id="all-tips"></div>
   </div>
+</div>
+
+<!-- ════════════ PAGE: COMPARE ════════════ -->
+<div id="page-compare" class="page">
+  <div style="background:linear-gradient(135deg,var(--navy2),#0a3d2e);padding:48px 24px;color:#fff;text-align:center">
+    <div style="font-size:11px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:#86EFAC;margin-bottom:7px">No Fake Prices · No Fake Availability</div>
+    <h1 style="font-family:var(--font-d);font-size:clamp(26px,4vw,44px);font-weight:900;margin-bottom:10px">🔗 Compare Before Booking</h1>
+    <p style="opacity:.75;font-size:15px;max-width:600px;margin:0 auto">We guide you to the best official platforms for flights, trains, buses and hotels. We never sell tickets or claim lowest rates.</p>
+  </div>
+  <div class="wrap" style="padding:36px 22px" id="compare-content"></div>
 </div>
 
 <!-- ════════════ BOTTOM NAV ════════════ -->
@@ -1177,16 +1279,25 @@ function renderGPStep(){
   const el=document.getElementById('gp-step-content');
   if(!el) return;
   if(GP.step===0) el.innerHTML=gpSetupHTML();
-  else if(GP.step===1) el.innerHTML=GP.loading?`<div style="text-align:center;padding:60px"><div class="spinner"></div><div style="margin-top:20px;font-size:16px;font-weight:800">Claude AI is planning your trip…</div></div>`:gpItinHTML();
+  else if(GP.step===1) el.innerHTML=GP.loading?`<div class="ai-loading-card">
+  <div class="spinner"></div>
+  <div style="margin-top:24px;font-family:var(--font-d);font-size:24px;font-weight:900">Planning Your Trip…</div>
+  <div style="color:var(--muted);font-size:14px;margin-top:6px">Claude AI is building your personalised itinerary</div>
+  <div class="ai-loading-steps">
+    <div class="ai-step done">✅ Reading your destination & preferences</div>
+    <div class="ai-step active">⏳ Building stops, timings & Google Maps links</div>
+    <div class="ai-step idle">⬜ Calculating fuel, food & expense estimate</div>
+  </div>
+</div>`:gpItinHTML();
   else if(GP.step===2) el.innerHTML=gpExpenseHTML();
 }
 function gpSetupHTML(){
   const veh=[{id:'car',n:'Car/SUV',s:5,r:2500,i:'🚗'},{id:'innova',n:'Innova Crysta',s:7,r:3500,i:'🚙'},{id:'tempo',n:'Tempo Traveller',s:12,r:5500,i:'🚐'},{id:'mini',n:'Mini Coach',s:20,r:8500,i:'🚌'},{id:'bus',n:'Full Bus',s:35,r:12000,i:'🚍'}];
-  const cats=[{id:'temple',l:'Pilgrimage',i:'🛕'},{id:'nature',l:'Nature',i:'🌿'},{id:'family',l:'Family',i:'👨‍👩‍👧'},{id:'heritage',l:'Heritage',i:'🏯'},{id:'picnic',l:'Picnic',i:'🧺'},{id:'corporate',l:'Corporate',i:'💼'}];
+  const cats=[{id:'temple',l:'Pilgrimage',i:'🛕'},{id:'nature',l:'Nature',i:'🌿'},{id:'family',l:'Family',i:'👨‍👩‍👧'},{id:'heritage',l:'Heritage',i:'🏯'},{id:'picnic',l:'Picnic',i:'🧺'},{id:'bike',l:'Bike Ride',i:'🏍️'},{id:'corporate',l:'Corporate',i:'💼'}];
   return `<div class="card" style="padding:28px">
     <div class="grid-2 mb16">
       <div><label class="field-lbl">Departure From</label><input class="field" value="${GP.from}" onchange="GP.from=this.value" placeholder="Bengaluru"/></div>
-      <div><label class="field-lbl">Destination (or leave for AI)</label><input class="field" value="${GP.dest}" onchange="GP.dest=this.value" placeholder="AI will suggest best option"/></div>
+      <div><label class="field-lbl">Destination <span style="color:var(--muted);font-weight:500;text-transform:none;letter-spacing:0">(type any place — Coorg, Tirupati, Nandi Hills, Goa, any city…)</span></label><input class="field" value="${GP.dest}" onchange="GP.dest=this.value" placeholder="e.g. Coorg, Tirupati, Nandi Hills, Goa, Hampi, Leh…" style="font-size:15px;font-weight:600"/></div>
       <div><label class="field-lbl">Travel Date</label><input class="field" type="date" value="${GP.date}" onchange="GP.date=this.value" min="${new Date().toISOString().split('T')[0]}"/></div>
       <div><label class="field-lbl">Start Time</label><input class="field" type="time" value="${GP.time}" onchange="GP.time=this.value"/></div>
       <div><label class="field-lbl">Return By</label><input class="field" type="time" value="${GP.returnBy}" onchange="GP.returnBy=this.value"/></div>
@@ -1247,17 +1358,106 @@ Return ONLY JSON: {"title":"","destination":"","summary":"","totalDist":"","driv
   GP.loading=false; renderGroup();
 }
 function demoGPItin(){
-  return{title:'Temple Day Trip — Mysuru Circuit',destination:'Mysuru',summary:'A well-planned temple and heritage day trip for '+GP.pax+' people from '+GP.from+'. Optimised for darshan timing and road conditions.',totalDist:'290 km round trip',driveTime:'5 hrs total',returnETA:'20:30',stops:[
-    {name:'Depart '+GP.from,type:'depart',icon:'🚐',time:GP.time,duration:'—',desc:'Board vehicle. Distribute snacks. Begin journey on NH275.',tip:'Depart sharp. Mysore Expressway is excellent — 3 hr drive.',map:'https://maps.google.com/?q='+encodeURIComponent(GP.from)},
-    {name:'Highway Tea Stop',type:'meal',icon:'☕',time:'07:45',duration:'20 min',desc:'Quick chai and breakfast break at Clean Dhaba near Channapatna.',tip:'Good quality filter coffee at the highway stalls.',map:'https://maps.google.com/?q=Channapatna+dhaba'},
-    {name:'Chamundeshwari Temple',type:'attraction',icon:'🛕',time:'09:00',duration:'2 hrs',desc:'Hilltop temple of Goddess Chamundeshwari. 1,000-step climb or road access.',tip:'Online seeghra darshan ticket saves 1 hr wait. Dress code enforced.',map:'https://maps.google.com/?q=Chamundeshwari+Temple+Mysuru'},
-    {name:'Mysore Palace',type:'attraction',icon:'🏛️',time:'11:30',duration:'1.5 hrs',desc:'The magnificent Indo-Saracenic royal palace. Entry ₹70/adult.',tip:'Audio guide available. Sunday 7–8 PM illumination is spectacular.',map:'https://maps.google.com/?q=Mysore+Palace'},
-    {name:'Vegetarian Lunch',type:'meal',icon:'🍛',time:'13:15',duration:'1 hr',desc:'Sri Venkateshwara Bhavan or Dasaprakash — both are legendary Mysuru thali spots.',tip:'Pre-book for groups of 12+. Budget ₹150–200/head.',map:'https://maps.google.com/?q=Dasaprakash+Mysuru'},
-    {name:'Brindavan Gardens',type:'attraction',icon:'🌸',time:'14:30',duration:'1 hr',desc:'Terraced gardens on the Kaveri with musical fountain (evenings).',tip:'Entry ₹30. Musical fountain at 6:30 PM — worth the wait if returning late.',map:'https://maps.google.com/?q=Brindavan+Gardens+Mysuru'},
-    {name:'Local Market & Shopping',type:'waypoint',icon:'🛍️',time:'15:45',duration:'45 min',desc:'Devaraja Market for incense, silk, sandalwood. Mysore Pak sweet shops nearby.',tip:'Fixed-price shops for silk. Good sandal products at GSS.',map:'https://maps.google.com/?q=Devaraja+Market+Mysuru'},
-    {name:'Begin Return to '+GP.from,type:'return',icon:'🏠',time:'16:30',duration:'3 hrs',desc:'Return journey via NH275. Tea stop at Ramanagara.',tip:'Avoid Bengaluru entry before 8:30 PM to miss peak traffic.',map:'https://maps.google.com/?q='+encodeURIComponent(GP.from)},
-    {name:'Arrive '+GP.from,type:'return',icon:'✅',time:'19:45',duration:'—',desc:'Safe return. Settle expenses and share report.',tip:'Transfer balance amount via UPI before dispersing.',map:'https://maps.google.com/?q='+encodeURIComponent(GP.from)},
-  ],expenseEstimate:{vehicle:5500,fuel:1200,toll:350,parking:100,driver:300,tickets:GP.pax*70,food:GP.pax*290,misc:300}};
+  // Always read actual user input — never hardcode destination
+  const dest = (GP.dest && GP.dest.trim() !== '') ? GP.dest.trim() : 'your destination';
+  const from = GP.from || 'Bengaluru';
+  const catLabels = {temple:'Pilgrimage',nature:'Nature',family:'Family',heritage:'Heritage',picnic:'Picnic',bike:'Bike Ride',corporate:'Corporate'};
+  const catIcons  = {temple:'🛕',nature:'🌿',family:'👨‍👩‍👧',heritage:'🏯',picnic:'🧺',bike:'🏍️',corporate:'💼'};
+  const catLabel  = catLabels[GP.cat] || GP.cat || 'Day';
+  const catIcon   = catIcons[GP.cat]  || '📍';
+
+  // Smart stops based on trip category
+  const isBike = GP.vehicle === 'car' && GP.cat === 'nature';
+  const isPilgrimage = GP.cat === 'temple';
+  const isNature = GP.cat === 'nature' || GP.cat === 'picnic';
+
+  const mainIcon   = isPilgrimage ? '🛕' : isNature ? '🌿' : catIcon;
+  const secondIcon = isPilgrimage ? '🙏' : isNature ? '🏞️' : '🗺️';
+  const lunchTip   = isPilgrimage
+    ? 'Many temples have free prasadam or affordable vegetarian canteens.'
+    : 'Search \"best restaurants near ' + dest + '\" on Google Maps before visiting.';
+
+  const vehData = {car:{r:2500,f:12},innova:{r:3500,f:8},tempo:{r:5500,f:6},mini:{r:8500,f:4.5},bus:{r:12000,f:3.5}};
+  const v = vehData[GP.vehicle] || vehData.tempo;
+  const distEst = 200; // approximate round trip km
+  const fuelEst = Math.round((distEst / v.f) * 102);
+
+  return {
+    title: catLabel + ' Trip — ' + dest,
+    destination: dest,
+    summary: 'A well-planned ' + catLabel.toLowerCase() + ' day trip for ' + GP.pax + ' people from ' + from + ' to ' + dest + '. Route, timings and stops optimised for your vehicle and trip type.',
+    totalDist: '~' + distEst + ' km round trip (verify on Google Maps)',
+    driveTime: 'Approx ' + Math.ceil(distEst / 50) + ' hrs driving total',
+    returnETA: GP.returnBy || '20:30',
+    stops: [
+      {
+        name: 'Depart ' + from,
+        type: 'depart', icon: '🚐',
+        time: GP.time || '05:30', duration: '—',
+        desc: 'Board vehicle. Check supplies, water and fuel. Begin journey to ' + dest + '.',
+        tip: 'Depart sharp — early start means cooler weather and lighter traffic.',
+        map: 'https://maps.google.com/?q=' + encodeURIComponent(from)
+      },
+      {
+        name: 'Highway Tea & Breakfast',
+        type: 'meal', icon: '☕',
+        time: '07:30', duration: '20–30 min',
+        desc: 'Quick chai and breakfast at a highway dhaba en route to ' + dest + '.',
+        tip: 'Choose a busy dhaba — high footfall means fresh food.',
+        map: 'https://maps.google.com/?q=dhaba+near+' + encodeURIComponent(dest)
+      },
+      {
+        name: dest + ' — Main Attraction',
+        type: 'attraction', icon: mainIcon,
+        time: '09:00', duration: '2–3 hrs',
+        desc: 'Explore the main highlight of ' + dest + '. Start early for the best experience without crowds.',
+        tip: 'Arrive by 9 AM — cooler, less crowded, and best lighting for photos.',
+        map: 'https://maps.google.com/?q=' + encodeURIComponent(dest)
+      },
+      {
+        name: 'Lunch at ' + dest,
+        type: 'meal', icon: '🍛',
+        time: '12:30', duration: '1 hr',
+        desc: 'Lunch at a well-reviewed local restaurant or eatery near ' + dest + '.',
+        tip: lunchTip,
+        map: 'https://maps.google.com/?q=restaurants+near+' + encodeURIComponent(dest)
+      },
+      {
+        name: dest + ' — Second Spot',
+        type: 'attraction', icon: secondIcon,
+        time: '14:00', duration: '1–1.5 hrs',
+        desc: 'Visit a secondary attraction, viewpoint or local market near ' + dest + '.',
+        tip: 'Ask your hotel or a local for the best hidden nearby spot — they always know!',
+        map: 'https://maps.google.com/?q=tourist+places+near+' + encodeURIComponent(dest)
+      },
+      {
+        name: 'Begin Return to ' + from,
+        type: 'return', icon: '🏠',
+        time: '15:30', duration: 'Drive back',
+        desc: 'Start return journey from ' + dest + ' to ' + from + '.',
+        tip: 'Stop for evening chai on the way. Account for city traffic near ' + from + '.',
+        map: 'https://maps.google.com/?q=' + encodeURIComponent(from) + '+from+' + encodeURIComponent(dest)
+      },
+      {
+        name: 'Arrive ' + from,
+        type: 'return', icon: '✅',
+        time: GP.returnBy || '20:30', duration: '—',
+        desc: 'Safe arrival back in ' + from + '. Settle group expenses and share WhatsApp report.',
+        tip: 'Transfer balance amount via UPI before dispersing.',
+        map: 'https://maps.google.com/?q=' + encodeURIComponent(from)
+      }
+    ],
+    expenseEstimate: {
+      vehicle: v.r,
+      fuel: fuelEst,
+      toll: 350,
+      parking: 100,
+      driver: 300,
+      tickets: GP.pax * (isPilgrimage ? 50 : 80),
+      food: GP.pax * 290,
+      misc: 250
+    }
+  };
 }
 function gpItinHTML(){
   const it=GP.itin;
@@ -1547,6 +1747,164 @@ renderHomeFeatured();
 renderHomeStates();
 renderHomeTemplates();
 renderHomeGems();
+
+/* ═══════════ HERO PLANNER HELPERS ═══════════ */
+function switchHeroTab(tab, btn){
+  document.querySelectorAll('.hsc-tab').forEach(b=>b.classList.remove('act'));
+  btn.classList.add('act');
+}
+function launchPlanner(){
+  const dest = document.getElementById('hsc-dest')?.value?.trim();
+  const from = document.getElementById('hsc-from')?.value?.trim();
+  if(from) GP.from = from;
+  if(dest) GP.dest = dest;
+  nav('group');
+}
+function quickPlan(dest){
+  document.getElementById('hsc-dest').value = dest;
+  GP.dest = dest;
+  GP.from = document.getElementById('hsc-from')?.value || 'Bengaluru';
+  nav('group');
+}
+
+/* ═══════════ COMPARE PAGE ═══════════ */
+let cmpTab = 'flights';
+function nav_compare_init(){
+  const el = document.getElementById('compare-content');
+  if(!el) return;
+  el.innerHTML = `
+    <div style="display:flex;gap:0;border-bottom:2px solid var(--steel);margin-bottom:28px;overflow-x:auto" id="cmp-tabs">
+      ${[['flights','✈️ Flights'],['trains','🚄 Trains'],['buses','🚌 Buses'],['hotels','🏨 Hotels']].map(([id,l])=>`
+        <button onclick="swCmp('${id}',this)"
+          style="background:none;border:none;padding:12px 18px;font-weight:800;font-size:13px;
+          color:${cmpTab===id?'var(--saffron)':'var(--muted)'};
+          border-bottom:3px solid ${cmpTab===id?'var(--saffron)':'transparent'};
+          margin-bottom:-2px;cursor:pointer;white-space:nowrap;font-family:var(--font-b)">${l}</button>`).join('')}
+    </div>
+    <div id="cmp-panel"></div>`;
+  rCmpPanel();
+}
+function swCmp(id,btn){
+  cmpTab=id;
+  document.querySelectorAll('#cmp-tabs button').forEach(b=>{b.style.color='var(--muted)';b.style.borderBottomColor='transparent';});
+  btn.style.color='var(--saffron)';btn.style.borderBottomColor='var(--saffron)';
+  rCmpPanel();
+}
+const BKPLAT={
+  flights:[
+    {n:'Air India',      u:'https://www.airindia.com',    lo:'✈️',ca:'Free 24h',bg:'25kg',sp:'24/7',of:true},
+    {n:'IndiGo',         u:'https://www.goindigo.in',     lo:'🔵',ca:'₹3,000 fee',bg:'15kg',sp:'24/7',of:true},
+    {n:'SpiceJet',       u:'https://www.spicejet.com',    lo:'🌶️',ca:'₹2,250 fee',bg:'15kg',sp:'24/7',of:true},
+    {n:'Akasa Air',      u:'https://www.akasaair.com',    lo:'🟡',ca:'₹2,500 fee',bg:'15kg',sp:'Chat',of:true},
+    {n:'MakeMyTrip',     u:'https://www.makemytrip.com',  lo:'🟠',ca:'Varies',bg:'Per airline',sp:'24/7',of:false},
+    {n:'Via.com',        u:'https://www.via.com',         lo:'🟤',ca:'Varies',bg:'Per airline',sp:'24/7',of:false},
+    {n:'EaseMyTrip',     u:'https://www.easemytrip.com',  lo:'🟢',ca:'Varies',bg:'Per airline',sp:'24/7',of:false},
+    {n:'Goibibo',        u:'https://www.goibibo.com',     lo:'🔴',ca:'Varies',bg:'Per airline',sp:'24/7',of:false},
+    {n:'Ixigo',          u:'https://www.ixigo.com',       lo:'🟣',ca:'Varies',bg:'Per airline',sp:'Chat',of:false},
+  ],
+  trains:[
+    {n:'IRCTC (Official)',u:'https://www.irctc.co.in',   lo:'🚄',ft:'Official — book tickets only here',nt:'The only authorised platform for Indian Railways tickets.'},
+    {n:'RailYatri',       u:'https://www.railyatri.in',  lo:'🚆',ft:'PNR tracking, live train status',  nt:'Best for tracking trains and live schedule updates.'},
+    {n:'ConfirmTkt',      u:'https://www.confirmtkt.com',lo:'🎫',ft:'WL/RAC confirmation predictions',  nt:'Check if your waiting list ticket will confirm.'},
+    {n:'Trainman',        u:'https://www.trainman.in',   lo:'🛤️',ft:'Seat availability predictor',       nt:'Good for alternative train options.'},
+    {n:'Ixigo Trains',    u:'https://trains.ixigo.com',  lo:'🟣',ft:'Running status & platform info',    nt:'Best for live train location.'},
+  ],
+  buses:[
+    {n:'KSRTC Karnataka',u:'https://www.ksrtc.in',           lo:'🚌',ty:'Govt',ft:'Inter-state, AC buses'},
+    {n:'KSRTC Kerala',   u:'https://www.keralartc.com',      lo:'🟡',ty:'Govt',ft:'Kerala state transport'},
+    {n:'APSRTC',         u:'https://www.apsrtc.ap.gov.in',   lo:'🔴',ty:'Govt',ft:'Andhra Pradesh'},
+    {n:'MSRTC',          u:'https://www.msrtcetcket.com',    lo:'🟤',ty:'Govt',ft:'Maharashtra'},
+    {n:'RedBus',         u:'https://www.redbus.in',          lo:'🔴',ty:'Private',ft:'Widest selection, ratings'},
+    {n:'AbhiBus',        u:'https://www.abhibus.com',        lo:'🟢',ty:'Private',ft:'Good offers and cashback'},
+    {n:'Via.com',        u:'https://www.via.com',            lo:'🟤',ty:'Private',ft:'Multiple operators'},
+    {n:'MakeMyTrip',     u:'https://www.makemytrip.com',     lo:'🟠',ty:'Private',ft:'24/7 support'},
+  ],
+  hotels:[
+    {n:'Booking.com',    u:'https://www.booking.com',   lo:'🔵',ft:'Free cancellation options',nt:'Largest inventory globally.'},
+    {n:'Goibibo',        u:'https://www.goibibo.com',   lo:'🔴',ft:'Indian hotels specialist', nt:'Best for budget Indian hotels.'},
+    {n:'Agoda',          u:'https://www.agoda.com',     lo:'🟡',ft:'Asia specialist',          nt:'Great rates for Asia trips.'},
+    {n:'Via.com',        u:'https://www.via.com',       lo:'🟤',ft:'Indian market focus',      nt:'Good customer support.'},
+    {n:'Hotels.com',     u:'https://www.hotels.com',    lo:'🟠',ft:'Loyalty rewards',           nt:'Free night after 10 stays.'},
+    {n:'MakeMyTrip',     u:'https://www.makemytrip.com',lo:'🟠',ft:'Indian travellers',         nt:'Good for domestic packages.'},
+    {n:'Airbnb',         u:'https://www.airbnb.co.in',  lo:'🌸',ft:'Unique stays & homestays',  nt:'Best for experience travel.'},
+  ],
+};
+function rCmpPanel(){
+  const el=document.getElementById('cmp-panel');if(!el)return;
+  const note=`<div style="background:rgba(249,115,22,.07);border:1.5px solid rgba(249,115,22,.2);border-radius:12px;padding:14px 18px;margin-bottom:22px;font-size:13px;color:var(--saffron2);font-weight:600">
+    ⚠️ DigiTravel guides you to official platforms. We never sell tickets or claim lowest prices. Always verify current rates before booking.
+  </div>`;
+  if(cmpTab==='flights'){
+    el.innerHTML=note+`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px">
+      ${BKPLAT.flights.map(p=>`
+        <div style="background:var(--white);border:1.5px solid var(--steel);border-radius:14px;padding:20px;transition:all .2s;box-shadow:var(--shadow)" onmouseenter="this.style.borderColor='var(--saffron)';this.style.boxShadow='var(--shadow-lg)'" onmouseleave="this.style.borderColor='var(--steel)';this.style.boxShadow='var(--shadow)'">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+            <span style="font-size:28px">${p.lo}</span>
+            <div><div style="font-weight:900;font-size:16px">${p.n}</div>
+            <div style="font-size:12px;color:var(--muted)">${p.of?'✅ Official Airline':'🔗 Booking Aggregator'}</div></div>
+          </div>
+          <div style="font-size:13px;color:var(--slate);margin-bottom:14px;display:flex;flex-direction:column;gap:4px">
+            <span>↩ Cancel: <strong>${p.ca}</strong></span>
+            <span>🧳 Baggage: <strong>${p.bg}</strong></span>
+            <span>📞 Support: <strong>${p.sp}</strong></span>
+          </div>
+          <a href="${p.u}" target="_blank" rel="noopener noreferrer">
+            <button style="width:100%;background:var(--saffron);color:#fff;border:none;border-radius:9px;padding:9px;font-weight:800;font-size:13px;cursor:pointer;font-family:var(--font-b)">Visit Website →</button>
+          </a>
+        </div>`).join('')}
+    </div>`;
+  } else if(cmpTab==='trains'){
+    el.innerHTML=note+`
+    <div style="background:#F0FDF4;border:1.5px solid #A7F3D0;border-radius:12px;padding:14px 18px;margin-bottom:18px;font-size:14px;color:var(--jade);font-weight:700">
+      🚄 Always book train tickets on the official <a href="https://www.irctc.co.in" target="_blank" style="color:var(--jade);text-decoration:underline">IRCTC.co.in</a>. Other platforms are for tracking only.
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px">
+      ${BKPLAT.trains.map(p=>`
+        <div style="background:var(--white);border:1.5px solid var(--steel);border-radius:14px;padding:20px;box-shadow:var(--shadow)">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px"><span style="font-size:28px">${p.lo}</span><div><div style="font-weight:900;font-size:16px">${p.n}</div><div style="font-size:12px;color:var(--muted)">${p.ft}</div></div></div>
+          <div style="font-size:13px;color:var(--slate);margin-bottom:14px">${p.nt}</div>
+          <a href="${p.u}" target="_blank" rel="noopener">
+            <button style="width:100%;background:${p.n.includes('IRCTC')?'var(--jade)':'var(--ice)'};color:${p.n.includes('IRCTC')?'#fff':'var(--ink)'};border:1.5px solid ${p.n.includes('IRCTC')?'var(--jade)':'var(--steel)'};border-radius:9px;padding:9px;font-weight:800;font-size:13px;cursor:pointer;font-family:var(--font-b)">${p.n.includes('IRCTC')?'Book Tickets →':'Visit Platform →'}</button>
+          </a>
+        </div>`).join('')}
+    </div>`;
+  } else if(cmpTab==='buses'){
+    const govBuses=BKPLAT.buses.filter(p=>p.ty==='Govt');
+    const pvtBuses=BKPLAT.buses.filter(p=>p.ty==='Private');
+    el.innerHTML=note+`
+      <h4 style="font-family:var(--font-d);font-size:18px;margin-bottom:14px">🏛️ Government Operators</h4>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-bottom:24px">
+        ${govBuses.map(p=>`<div style="background:var(--white);border:1.5px solid var(--steel);border-radius:14px;padding:18px;box-shadow:var(--shadow)">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><span style="font-size:26px">${p.lo}</span><div><div style="font-weight:900;font-size:15px">${p.n}</div><div style="font-size:12px;color:var(--muted)">${p.ft}</div></div></div>
+          <a href="${p.u}" target="_blank" rel="noopener"><button style="width:100%;background:var(--navy);color:#fff;border:none;border-radius:9px;padding:9px;font-weight:800;font-size:13px;cursor:pointer;font-family:var(--font-b)">Visit Official Site →</button></a>
+        </div>`).join('')}
+      </div>
+      <h4 style="font-family:var(--font-d);font-size:18px;margin-bottom:14px">🏢 Private Operators</h4>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px">
+        ${pvtBuses.map(p=>`<div style="background:var(--white);border:1.5px solid var(--steel);border-radius:14px;padding:18px;box-shadow:var(--shadow)">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><span style="font-size:26px">${p.lo}</span><div><div style="font-weight:900;font-size:15px">${p.n}</div><div style="font-size:12px;color:var(--muted)">${p.ft}</div></div></div>
+          <a href="${p.u}" target="_blank" rel="noopener"><button style="width:100%;background:transparent;color:var(--saffron);border:2px solid var(--saffron);border-radius:9px;padding:9px;font-weight:800;font-size:13px;cursor:pointer;font-family:var(--font-b)">Compare Options →</button></a>
+        </div>`).join('')}
+      </div>`;
+  } else if(cmpTab==='hotels'){
+    el.innerHTML=note+`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px">
+      ${BKPLAT.hotels.map(p=>`
+        <div style="background:var(--white);border:1.5px solid var(--steel);border-radius:14px;padding:20px;box-shadow:var(--shadow)" onmouseenter="this.style.borderColor='var(--saffron)'" onmouseleave="this.style.borderColor='var(--steel)'">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px"><span style="font-size:28px">${p.lo}</span><div><div style="font-weight:900;font-size:16px">${p.n}</div><div style="font-size:12px;color:var(--muted)">${p.ft}</div></div></div>
+          <div style="font-size:13px;color:var(--slate);margin-bottom:14px">${p.nt}</div>
+          <a href="${p.u}" target="_blank" rel="noopener"><button style="width:100%;background:transparent;color:var(--saffron);border:2px solid var(--saffron);border-radius:9px;padding:9px;font-weight:800;font-size:13px;cursor:pointer;font-family:var(--font-b)">Compare Options →</button></a>
+        </div>`).join('')}
+    </div>`;
+  }
+}
+
+/* Patch nav() to init compare page */
+const _origNav = nav;
+function nav(id){
+  _origNav(id);
+  if(id==='compare') setTimeout(nav_compare_init, 50);
+}
+
 </script>
 </body>
 </html>
