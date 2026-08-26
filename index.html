@@ -1900,10 +1900,10 @@ function rCmpPanel(){
 
 /* Patch nav() to init compare page */
 const _origNav = nav;
-function nav(id){
+nav = function(id){
   _origNav(id);
   if(id==='compare') setTimeout(nav_compare_init, 50);
-}
+};
 
 </script>
 </body>
