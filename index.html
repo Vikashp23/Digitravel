@@ -912,7 +912,7 @@ function toggleMenu(){const m=document.getElementById('mob-menu');m.style.displa
 function closeMob(){document.getElementById('mob-menu').style.display='none';}
 function toggleDark(){document.body.classList.toggle('dark');document.getElementById('dkBtn').textContent=document.body.classList.contains('dark')?'☀️':'🌙';}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
-function waOpen(){window.open('https://wa.me/918539979271?text='+encodeURIComponent('Hello DigiTravel! I need help planning my India trip.'),'_blank');}
+function waOpen(){window.open('https://wa.me/919999999999?text='+encodeURIComponent('Hello DigiTravel! I need help planning my India trip.'),'_blank');}
 
 /* ═══════════════════════ SEARCH ═══════════════════════ */
 function openSearch(){
@@ -1774,7 +1774,7 @@ function nav_compare_init(){
   if(!el) return;
   el.innerHTML = `
     <div style="display:flex;gap:0;border-bottom:2px solid var(--steel);margin-bottom:28px;overflow-x:auto" id="cmp-tabs">
-      ${[['flights','✈️ Flights'],['trains','🚄 Trains'],['buses','🚌 Buses'],['hotels','🏨 Hotels']].map(([id,l])=>`
+      ${[['flights','✈️ Flights'],['trains','🚄 Trains'],['buses','🚌 Buses'],['hotels','🏨 Hotels'],['packages','🎒 Holiday Packages']].map(([id,l])=>`
         <button onclick="swCmp('${id}',this)"
           style="background:none;border:none;padding:12px 18px;font-weight:800;font-size:13px;
           color:${cmpTab===id?'var(--saffron)':'var(--muted)'};
@@ -1827,6 +1827,16 @@ const BKPLAT={
     {n:'Hotels.com',     u:'https://www.hotels.com',    lo:'🟠',ft:'Loyalty rewards',           nt:'Free night after 10 stays.'},
     {n:'MakeMyTrip',     u:'https://www.makemytrip.com',lo:'🟠',ft:'Indian travellers',         nt:'Good for domestic packages.'},
     {n:'Airbnb',         u:'https://www.airbnb.co.in',  lo:'🌸',ft:'Unique stays & homestays',  nt:'Best for experience travel.'},
+  ],
+  packages:[
+    {n:'Trip dreamz (WhatsApp Catalog)', u:'https://wa.me/c/917996000996', lo:'💬', ft:'Chat directly for custom packages', nt:'Browse packages and get a quote right on WhatsApp.', wa:true},
+    {n:'Via Holidays',   u:'https://www.via.com/holidays',       lo:'🟤',ft:'Domestic & international packages', nt:'Customisable group and family packages.'},
+    {n:'IRCTC Tourism',  u:'https://www.irctctourism.com',       lo:'🚄',ft:'Rail-linked tour packages',        nt:'Official IRCTC tour packages across India.'},
+    {n:'Thomas Cook',    u:'https://www.thomascook.in',          lo:'🧳',ft:'Established travel agency',        nt:'Wide range of domestic & international tours.'},
+    {n:'Kesari Tours',   u:'https://www.kesari.in',               lo:'🟠',ft:'Group pilgrimage & leisure tours', nt:'Popular for Maharashtra-origin group tours.'},
+    {n:'SOTC',           u:'https://www.sotc.in',                lo:'🔵',ft:'Guided group tours',               nt:'Large network of escorted tours.'},
+    {n:'Veena World',    u:'https://www.veenaworld.com',          lo:'🟢',ft:'Curated group holidays',           nt:'Known for well-organised group departures.'},
+    {n:'Thrillophilia',  u:'https://www.thrillophilia.com',       lo:'🎯',ft:'Activities & experience packages',  nt:'Best for adventure and day-activity bookings.'},
   ],
 };
 function rCmpPanel(){
@@ -1893,6 +1903,17 @@ function rCmpPanel(){
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px"><span style="font-size:28px">${p.lo}</span><div><div style="font-weight:900;font-size:16px">${p.n}</div><div style="font-size:12px;color:var(--muted)">${p.ft}</div></div></div>
           <div style="font-size:13px;color:var(--slate);margin-bottom:14px">${p.nt}</div>
           <a href="${p.u}" target="_blank" rel="noopener"><button style="width:100%;background:transparent;color:var(--saffron);border:2px solid var(--saffron);border-radius:9px;padding:9px;font-weight:800;font-size:13px;cursor:pointer;font-family:var(--font-b)">Compare Options →</button></a>
+        </div>`).join('')}
+    </div>`;
+  } else if(cmpTab==='packages'){
+    el.innerHTML=note+`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px">
+      ${BKPLAT.packages.map(p=>`
+        <div style="background:var(--white);border:1.5px solid ${p.wa?'#25D366':'var(--steel)'};border-radius:14px;padding:20px;box-shadow:var(--shadow)">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px"><span style="font-size:28px">${p.lo}</span><div><div style="font-weight:900;font-size:16px">${p.n}</div><div style="font-size:12px;color:var(--muted)">${p.ft}</div></div></div>
+          <div style="font-size:13px;color:var(--slate);margin-bottom:14px">${p.nt}</div>
+          <a href="${p.u}" target="_blank" rel="noopener">
+            <button style="width:100%;background:${p.wa?'#25D366':'transparent'};color:${p.wa?'#fff':'var(--saffron)'};border:2px solid ${p.wa?'#25D366':'var(--saffron)'};border-radius:9px;padding:9px;font-weight:800;font-size:13px;cursor:pointer;font-family:var(--font-b)">${p.wa?'Open WhatsApp Catalog →':'View Packages →'}</button>
+          </a>
         </div>`).join('')}
     </div>`;
   }
