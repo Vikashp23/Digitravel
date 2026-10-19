@@ -912,7 +912,7 @@ function toggleMenu(){const m=document.getElementById('mob-menu');m.style.displa
 function closeMob(){document.getElementById('mob-menu').style.display='none';}
 function toggleDark(){document.body.classList.toggle('dark');document.getElementById('dkBtn').textContent=document.body.classList.contains('dark')?'☀️':'🌙';}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
-function waOpen(){window.open('https://wa.me/919999999999?text='+encodeURIComponent('Hello DigiTravel! I need help planning my India trip.'),'_blank');}
+function waOpen(){window.open('https://wa.me/918539979271?text='+encodeURIComponent('Hello DigiTravel! I need help planning my India trip.'),'_blank');}
 
 /* ═══════════════════════ SEARCH ═══════════════════════ */
 function openSearch(){
@@ -1768,27 +1768,18 @@ function quickPlan(dest){
 }
 
 /* ═══════════ COMPARE PAGE ═══════════ */
-let cmpTab = 'flights';
 function nav_compare_init(){
   const el = document.getElementById('compare-content');
   if(!el) return;
-  el.innerHTML = `
-    <div style="display:flex;gap:0;border-bottom:2px solid var(--steel);margin-bottom:28px;overflow-x:auto" id="cmp-tabs">
-      ${[['flights','✈️ Flights'],['trains','🚄 Trains'],['buses','🚌 Buses'],['hotels','🏨 Hotels'],['packages','🎒 Holiday Packages']].map(([id,l])=>`
-        <button onclick="swCmp('${id}',this)"
-          style="background:none;border:none;padding:12px 18px;font-weight:800;font-size:13px;
-          color:${cmpTab===id?'var(--saffron)':'var(--muted)'};
-          border-bottom:3px solid ${cmpTab===id?'var(--saffron)':'transparent'};
-          margin-bottom:-2px;cursor:pointer;white-space:nowrap;font-family:var(--font-b)">${l}</button>`).join('')}
-    </div>
-    <div id="cmp-panel"></div>`;
-  rCmpPanel();
-}
-function swCmp(id,btn){
-  cmpTab=id;
-  document.querySelectorAll('#cmp-tabs button').forEach(b=>{b.style.color='var(--muted)';b.style.borderBottomColor='transparent';});
-  btn.style.color='var(--saffron)';btn.style.borderBottomColor='var(--saffron)';
-  rCmpPanel();
+  const note=`<div style="background:rgba(249,115,22,.07);border:1.5px solid rgba(249,115,22,.2);border-radius:12px;padding:14px 18px;margin-bottom:28px;font-size:13px;color:var(--saffron2);font-weight:600">
+    ⚠️ DigiTravel guides you to official platforms. We never sell tickets or claim lowest prices. Always verify current rates before booking.
+  </div>`;
+  const jump=`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px">
+    ${[['cmp-air','✈️ Air'],['cmp-rail','🚄 Rail'],['cmp-bus','🚌 Bus'],['cmp-hotels','🏨 Hotels'],['cmp-holiday','🎒 Holiday']].map(([id,l])=>`
+      <a href="#${id}" style="text-decoration:none;background:var(--ice);border:1.5px solid var(--steel);border-radius:99px;padding:7px 16px;font-size:13px;font-weight:800;color:var(--ink);font-family:var(--font-b)">${l}</a>`).join('')}
+  </div>`;
+  el.innerHTML = note + jump
+    + sectionAir() + sectionRail() + sectionBus() + sectionHotels() + sectionHoliday();
 }
 const BKPLAT={
   flights:[
@@ -1840,84 +1831,88 @@ const BKPLAT={
     {n:'Thrillophilia',  u:'https://www.thrillophilia.com',       lo:'🎯',ft:'Activities & experience packages',  nt:'Best for adventure and day-activity bookings.'},
   ],
 };
-function rCmpPanel(){
-  const el=document.getElementById('cmp-panel');if(!el)return;
-  const note=`<div style="background:rgba(249,115,22,.07);border:1.5px solid rgba(249,115,22,.2);border-radius:12px;padding:14px 18px;margin-bottom:22px;font-size:13px;color:var(--saffron2);font-weight:600">
-    ⚠️ DigiTravel guides you to official platforms. We never sell tickets or claim lowest prices. Always verify current rates before booking.
+function sectionHeader(id,icon,title,sub){
+  return `<div id="${id}" style="scroll-margin-top:90px;margin-bottom:16px;padding-top:8px;border-top:3px solid var(--saffron)">
+    <h3 style="font-family:var(--font-d);font-size:22px;margin:14px 0 4px">${icon} ${title}</h3>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:18px">${sub}</div>
   </div>`;
-  if(cmpTab==='flights'){
-    el.innerHTML=note+`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px">
-      ${BKPLAT.flights.map(p=>`
-        <div style="background:var(--white);border:1.5px solid var(--steel);border-radius:14px;padding:20px;transition:all .2s;box-shadow:var(--shadow)" onmouseenter="this.style.borderColor='var(--saffron)';this.style.boxShadow='var(--shadow-lg)'" onmouseleave="this.style.borderColor='var(--steel)';this.style.boxShadow='var(--shadow)'">
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-            <span style="font-size:28px">${p.lo}</span>
-            <div><div style="font-weight:900;font-size:16px">${p.n}</div>
-            <div style="font-size:12px;color:var(--muted)">${p.of?'✅ Official Airline':'🔗 Booking Aggregator'}</div></div>
-          </div>
-          <div style="font-size:13px;color:var(--slate);margin-bottom:14px;display:flex;flex-direction:column;gap:4px">
-            <span>↩ Cancel: <strong>${p.ca}</strong></span>
-            <span>🧳 Baggage: <strong>${p.bg}</strong></span>
-            <span>📞 Support: <strong>${p.sp}</strong></span>
-          </div>
-          <a href="${p.u}" target="_blank" rel="noopener noreferrer">
-            <button style="width:100%;background:var(--saffron);color:#fff;border:none;border-radius:9px;padding:9px;font-weight:800;font-size:13px;cursor:pointer;font-family:var(--font-b)">Visit Website →</button>
-          </a>
-        </div>`).join('')}
-    </div>`;
-  } else if(cmpTab==='trains'){
-    el.innerHTML=note+`
-    <div style="background:#F0FDF4;border:1.5px solid #A7F3D0;border-radius:12px;padding:14px 18px;margin-bottom:18px;font-size:14px;color:var(--jade);font-weight:700">
-      🚄 Always book train tickets on the official <a href="https://www.irctc.co.in" target="_blank" style="color:var(--jade);text-decoration:underline">IRCTC.co.in</a>. Other platforms are for tracking only.
+}
+function sectionAir(){
+  return sectionHeader('cmp-air','✈️','Air','Compare official airline sites and trusted aggregators.')
+    + `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-bottom:44px">
+    ${BKPLAT.flights.map(p=>`
+      <div style="background:var(--white);border:1.5px solid var(--steel);border-radius:14px;padding:20px;transition:all .2s;box-shadow:var(--shadow)" onmouseenter="this.style.borderColor='var(--saffron)';this.style.boxShadow='var(--shadow-lg)'" onmouseleave="this.style.borderColor='var(--steel)';this.style.boxShadow='var(--shadow)'">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <span style="font-size:28px">${p.lo}</span>
+          <div><div style="font-weight:900;font-size:16px">${p.n}</div>
+          <div style="font-size:12px;color:var(--muted)">${p.of?'✅ Official Airline':'🔗 Booking Aggregator'}</div></div>
+        </div>
+        <div style="font-size:13px;color:var(--slate);margin-bottom:14px;display:flex;flex-direction:column;gap:4px">
+          <span>↩ Cancel: <strong>${p.ca}</strong></span>
+          <span>🧳 Baggage: <strong>${p.bg}</strong></span>
+          <span>📞 Support: <strong>${p.sp}</strong></span>
+        </div>
+        <a href="${p.u}" target="_blank" rel="noopener noreferrer">
+          <button style="width:100%;background:var(--saffron);color:#fff;border:none;border-radius:9px;padding:9px;font-weight:800;font-size:13px;cursor:pointer;font-family:var(--font-b)">Visit Website →</button>
+        </a>
+      </div>`).join('')}
+  </div>`;
+}
+function sectionRail(){
+  return sectionHeader('cmp-rail','🚄','Rail','Always book tickets on the official IRCTC site; other platforms are for tracking only.')
+    + `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-bottom:44px">
+    ${BKPLAT.trains.map(p=>`
+      <div style="background:var(--white);border:1.5px solid var(--steel);border-radius:14px;padding:20px;box-shadow:var(--shadow)">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px"><span style="font-size:28px">${p.lo}</span><div><div style="font-weight:900;font-size:16px">${p.n}</div><div style="font-size:12px;color:var(--muted)">${p.ft}</div></div></div>
+        <div style="font-size:13px;color:var(--slate);margin-bottom:14px">${p.nt}</div>
+        <a href="${p.u}" target="_blank" rel="noopener">
+          <button style="width:100%;background:${p.n.includes('IRCTC')?'var(--jade)':'var(--ice)'};color:${p.n.includes('IRCTC')?'#fff':'var(--ink)'};border:1.5px solid ${p.n.includes('IRCTC')?'var(--jade)':'var(--steel)'};border-radius:9px;padding:9px;font-weight:800;font-size:13px;cursor:pointer;font-family:var(--font-b)">${p.n.includes('IRCTC')?'Book Tickets →':'Visit Platform →'}</button>
+        </a>
+      </div>`).join('')}
+  </div>`;
+}
+function sectionBus(){
+  const govBuses=BKPLAT.buses.filter(p=>p.ty==='Govt');
+  const pvtBuses=BKPLAT.buses.filter(p=>p.ty==='Private');
+  return sectionHeader('cmp-bus','🚌','Bus','Government operators for official routes; private platforms for wider selection.')
+    + `<h4 style="font-family:var(--font-d);font-size:17px;margin-bottom:12px">🏛️ Government Operators</h4>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-bottom:22px">
+      ${govBuses.map(p=>`<div style="background:var(--white);border:1.5px solid var(--steel);border-radius:14px;padding:18px;box-shadow:var(--shadow)">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><span style="font-size:26px">${p.lo}</span><div><div style="font-weight:900;font-size:15px">${p.n}</div><div style="font-size:12px;color:var(--muted)">${p.ft}</div></div></div>
+        <a href="${p.u}" target="_blank" rel="noopener"><button style="width:100%;background:var(--navy);color:#fff;border:none;border-radius:9px;padding:9px;font-weight:800;font-size:13px;cursor:pointer;font-family:var(--font-b)">Visit Official Site →</button></a>
+      </div>`).join('')}
     </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px">
-      ${BKPLAT.trains.map(p=>`
-        <div style="background:var(--white);border:1.5px solid var(--steel);border-radius:14px;padding:20px;box-shadow:var(--shadow)">
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px"><span style="font-size:28px">${p.lo}</span><div><div style="font-weight:900;font-size:16px">${p.n}</div><div style="font-size:12px;color:var(--muted)">${p.ft}</div></div></div>
-          <div style="font-size:13px;color:var(--slate);margin-bottom:14px">${p.nt}</div>
-          <a href="${p.u}" target="_blank" rel="noopener">
-            <button style="width:100%;background:${p.n.includes('IRCTC')?'var(--jade)':'var(--ice)'};color:${p.n.includes('IRCTC')?'#fff':'var(--ink)'};border:1.5px solid ${p.n.includes('IRCTC')?'var(--jade)':'var(--steel)'};border-radius:9px;padding:9px;font-weight:800;font-size:13px;cursor:pointer;font-family:var(--font-b)">${p.n.includes('IRCTC')?'Book Tickets →':'Visit Platform →'}</button>
-          </a>
-        </div>`).join('')}
+    <h4 style="font-family:var(--font-d);font-size:17px;margin-bottom:12px">🏢 Private Operators</h4>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-bottom:44px">
+      ${pvtBuses.map(p=>`<div style="background:var(--white);border:1.5px solid var(--steel);border-radius:14px;padding:18px;box-shadow:var(--shadow)">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><span style="font-size:26px">${p.lo}</span><div><div style="font-weight:900;font-size:15px">${p.n}</div><div style="font-size:12px;color:var(--muted)">${p.ft}</div></div></div>
+        <a href="${p.u}" target="_blank" rel="noopener"><button style="width:100%;background:transparent;color:var(--saffron);border:2px solid var(--saffron);border-radius:9px;padding:9px;font-weight:800;font-size:13px;cursor:pointer;font-family:var(--font-b)">Compare Options →</button></a>
+      </div>`).join('')}
     </div>`;
-  } else if(cmpTab==='buses'){
-    const govBuses=BKPLAT.buses.filter(p=>p.ty==='Govt');
-    const pvtBuses=BKPLAT.buses.filter(p=>p.ty==='Private');
-    el.innerHTML=note+`
-      <h4 style="font-family:var(--font-d);font-size:18px;margin-bottom:14px">🏛️ Government Operators</h4>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-bottom:24px">
-        ${govBuses.map(p=>`<div style="background:var(--white);border:1.5px solid var(--steel);border-radius:14px;padding:18px;box-shadow:var(--shadow)">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><span style="font-size:26px">${p.lo}</span><div><div style="font-weight:900;font-size:15px">${p.n}</div><div style="font-size:12px;color:var(--muted)">${p.ft}</div></div></div>
-          <a href="${p.u}" target="_blank" rel="noopener"><button style="width:100%;background:var(--navy);color:#fff;border:none;border-radius:9px;padding:9px;font-weight:800;font-size:13px;cursor:pointer;font-family:var(--font-b)">Visit Official Site →</button></a>
-        </div>`).join('')}
-      </div>
-      <h4 style="font-family:var(--font-d);font-size:18px;margin-bottom:14px">🏢 Private Operators</h4>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px">
-        ${pvtBuses.map(p=>`<div style="background:var(--white);border:1.5px solid var(--steel);border-radius:14px;padding:18px;box-shadow:var(--shadow)">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><span style="font-size:26px">${p.lo}</span><div><div style="font-weight:900;font-size:15px">${p.n}</div><div style="font-size:12px;color:var(--muted)">${p.ft}</div></div></div>
-          <a href="${p.u}" target="_blank" rel="noopener"><button style="width:100%;background:transparent;color:var(--saffron);border:2px solid var(--saffron);border-radius:9px;padding:9px;font-weight:800;font-size:13px;cursor:pointer;font-family:var(--font-b)">Compare Options →</button></a>
-        </div>`).join('')}
-      </div>`;
-  } else if(cmpTab==='hotels'){
-    el.innerHTML=note+`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px">
-      ${BKPLAT.hotels.map(p=>`
-        <div style="background:var(--white);border:1.5px solid var(--steel);border-radius:14px;padding:20px;box-shadow:var(--shadow)" onmouseenter="this.style.borderColor='var(--saffron)'" onmouseleave="this.style.borderColor='var(--steel)'">
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px"><span style="font-size:28px">${p.lo}</span><div><div style="font-weight:900;font-size:16px">${p.n}</div><div style="font-size:12px;color:var(--muted)">${p.ft}</div></div></div>
-          <div style="font-size:13px;color:var(--slate);margin-bottom:14px">${p.nt}</div>
-          <a href="${p.u}" target="_blank" rel="noopener"><button style="width:100%;background:transparent;color:var(--saffron);border:2px solid var(--saffron);border-radius:9px;padding:9px;font-weight:800;font-size:13px;cursor:pointer;font-family:var(--font-b)">Compare Options →</button></a>
-        </div>`).join('')}
-    </div>`;
-  } else if(cmpTab==='packages'){
-    el.innerHTML=note+`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px">
-      ${BKPLAT.packages.map(p=>`
-        <div style="background:var(--white);border:1.5px solid ${p.wa?'#25D366':'var(--steel)'};border-radius:14px;padding:20px;box-shadow:var(--shadow)">
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px"><span style="font-size:28px">${p.lo}</span><div><div style="font-weight:900;font-size:16px">${p.n}</div><div style="font-size:12px;color:var(--muted)">${p.ft}</div></div></div>
-          <div style="font-size:13px;color:var(--slate);margin-bottom:14px">${p.nt}</div>
-          <a href="${p.u}" target="_blank" rel="noopener">
-            <button style="width:100%;background:${p.wa?'#25D366':'transparent'};color:${p.wa?'#fff':'var(--saffron)'};border:2px solid ${p.wa?'#25D366':'var(--saffron)'};border-radius:9px;padding:9px;font-weight:800;font-size:13px;cursor:pointer;font-family:var(--font-b)">${p.wa?'Open WhatsApp Catalog →':'View Packages →'}</button>
-          </a>
-        </div>`).join('')}
-    </div>`;
-  }
+}
+function sectionHotels(){
+  return sectionHeader('cmp-hotels','🏨','Hotels','Compare across major hotel booking platforms.')
+    + `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-bottom:44px">
+    ${BKPLAT.hotels.map(p=>`
+      <div style="background:var(--white);border:1.5px solid var(--steel);border-radius:14px;padding:20px;box-shadow:var(--shadow)" onmouseenter="this.style.borderColor='var(--saffron)'" onmouseleave="this.style.borderColor='var(--steel)'">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px"><span style="font-size:28px">${p.lo}</span><div><div style="font-weight:900;font-size:16px">${p.n}</div><div style="font-size:12px;color:var(--muted)">${p.ft}</div></div></div>
+        <div style="font-size:13px;color:var(--slate);margin-bottom:14px">${p.nt}</div>
+        <a href="${p.u}" target="_blank" rel="noopener"><button style="width:100%;background:transparent;color:var(--saffron);border:2px solid var(--saffron);border-radius:9px;padding:9px;font-weight:800;font-size:13px;cursor:pointer;font-family:var(--font-b)">Compare Options →</button></a>
+      </div>`).join('')}
+  </div>`;
+}
+function sectionHoliday(){
+  return sectionHeader('cmp-holiday','🎒','Holiday Packages','Chat directly with package operators on WhatsApp, or browse established tour companies.')
+    + `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px">
+    ${BKPLAT.packages.map(p=>`
+      <div style="background:var(--white);border:1.5px solid ${p.wa?'#25D366':'var(--steel)'};border-radius:14px;padding:20px;box-shadow:var(--shadow)">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px"><span style="font-size:28px">${p.lo}</span><div><div style="font-weight:900;font-size:16px">${p.n}</div><div style="font-size:12px;color:var(--muted)">${p.ft}</div></div></div>
+        <div style="font-size:13px;color:var(--slate);margin-bottom:14px">${p.nt}</div>
+        <a href="${p.u}" target="_blank" rel="noopener">
+          <button style="width:100%;background:${p.wa?'#25D366':'transparent'};color:${p.wa?'#fff':'var(--saffron)'};border:2px solid ${p.wa?'#25D366':'var(--saffron)'};border-radius:9px;padding:9px;font-weight:800;font-size:13px;cursor:pointer;font-family:var(--font-b)">${p.wa?'Open WhatsApp Catalog →':'View Packages →'}</button>
+        </a>
+      </div>`).join('')}
+  </div>`;
 }
 
 /* Patch nav() to init compare page */
